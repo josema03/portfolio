@@ -1,9 +1,9 @@
 import React from "react";
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
+import Theme from "../components/Theme";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
   React.useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector("#jss-server-side");
@@ -12,5 +12,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, []);
 
+  return (
+    <Theme>
+      <Component {...pageProps} />
+    </Theme>
+  );
 }
 export default MyApp;
