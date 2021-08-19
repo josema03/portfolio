@@ -4,12 +4,6 @@ function rand(max: number) {
   return Math.random() * max;
 }
 
-interface StarsDrawArgs {
-  lastResizeTime: number;
-  resizeCooldown: number;
-  resizeTimeout: number;
-}
-
 class Star {
   constructor(canvas: HTMLCanvasElement, size: number, speed: number) {
     this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -44,10 +38,11 @@ const Canvas = () => {
   const resizeTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const starsRef = useRef<Star[]>([]);
   const lastPaintTimeRef = useRef<number>(0);
+  const lastResizeTimeRef = useRef<number>(0);
   const ms = 16;
 
   const drawStars = (delta: number) => {
-    for (var i = 0; i < starsRef.current.length; i++) {
+    for (let i = 0; i < starsRef.current.length; i++) {
       starsRef.current[i].animate(delta);
     }
   };
@@ -56,7 +51,7 @@ const Canvas = () => {
     const canvas = canvasRef.current as HTMLCanvasElement;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var delta = (timestamp - lastPaintTimeRef.current) / 1000;
+    let delta = (timestamp - lastPaintTimeRef.current) / 1000;
     if (delta > 0.05) {
       delta = 0.05;
     }
@@ -73,9 +68,9 @@ const Canvas = () => {
     canvas.style.opacity = "0";
     canvas.style.display = "block";
 
-    var startTime = Date.now();
-    var tick = function () {
-      var newOpacity = (Date.now() - startTime) / duration;
+    let startTime = Date.now();
+    let tick = function () {
+      let newOpacity = (Date.now() - startTime) / duration;
       if (newOpacity > 1) {
         newOpacity = 1;
         callback && callback();
@@ -83,59 +78,57 @@ const Canvas = () => {
         requestAnimationFrame(tick);
       }
 
-      canvas.style.opacity = "newOpacity";
+      canvas.style.opacity = `${newOpacity}`;
     };
     tick();
   };
 
   const initializeStars = (canvas: HTMLCanvasElement) => {
-    var winArea = window.innerWidth * window.innerHeight;
-    var smallStarsDensity = 0.0001;
-    var mediumStarsDensity = 0.00005;
-    var largeStarsDensity = 0.00002;
-    var smallStarsCount = winArea * smallStarsDensity;
-    var mediumStarsCount = winArea * mediumStarsDensity;
-    var largeStarsCount = winArea * largeStarsDensity;
-    for (var i = 0; i < smallStarsCount; i++) {
+    let winArea = window.innerWidth * window.innerHeight;
+    let smallStarsDensity = 0.0001;
+    let mediumStarsDensity = 0.00005;
+    let largeStarsDensity = 0.00002;
+    let smallStarsCount = winArea * smallStarsDensity;
+    let mediumStarsCount = winArea * mediumStarsDensity;
+    let largeStarsCount = winArea * largeStarsDensity;
+    for (let i = 0; i < smallStarsCount; i++) {
       starsRef.current.push(new Star(canvas, 1, 30));
     }
 
-    for (var i = 0; i < mediumStarsCount; i++) {
+    for (let i = 0; i < mediumStarsCount; i++) {
       starsRef.current.push(new Star(canvas, 2, 20));
     }
 
-    for (var i = 0; i < largeStarsCount; i++) {
+    for (let i = 0; i < largeStarsCount; i++) {
       starsRef.current.push(new Star(canvas, 3, 10));
     }
   };
 
   const resizeFunction = (
     canvas: HTMLCanvasElement,
-    { lastResizeTime, resizeCooldown, resizeTimeout }: StarsDrawArgs
+    resizeCooldown: number
   ) => {
-    if (Date.now() - lastResizeTime < resizeCooldown && resizeTimeout) {
-      clearTimeout(resizeTimeout);
+    if (
+      Date.now() - lastResizeTimeRef.current < resizeCooldown &&
+      resizeTimeoutRef.current
+    ) {
+      clearTimeout(resizeTimeoutRef.current as NodeJS.Timeout);
     }
 
-    lastResizeTime = Date.now();
+    lastResizeTimeRef.current = Date.now();
+    starsRef.current = [];
     canvas.style.display = "none";
     resizeTimeoutRef.current = setTimeout(() => {
       fadeIn(canvas, 500);
       initializeStars(canvas);
     }, 500);
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight - 64;
   };
 
-  const starsDraw = (
-    canvas: HTMLCanvasElement,
-    { lastResizeTime, resizeCooldown, resizeTimeout }: StarsDrawArgs
-  ) => {
+  const starsDraw = (canvas: HTMLCanvasElement) => {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    window.addEventListener("resize", () =>
-      resizeFunction(canvas, { lastResizeTime, resizeCooldown, resizeTimeout })
-    );
+    canvas.height = window.innerHeight - 64;
     initializeStars(canvas);
     requestAnimationFrame(paintLoop);
   };
@@ -143,11 +136,12 @@ const Canvas = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      starsDraw(canvas, {
-        lastResizeTime: 0,
-        resizeCooldown: 500,
-        resizeTimeout: 500,
-      });
+      const resizeCallback = () => resizeFunction(canvas, 500);
+      window.addEventListener("resize", resizeCallback);
+      starsDraw(canvas);
+      return () => {
+        window.removeEventListener("resize", resizeCallback);
+      };
     }
   });
 
