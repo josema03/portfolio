@@ -10,5 +10,17 @@ export default function Home() {
     { label: "Lorem Ipsum Option" },
     { label: "Lorem Ipsum Option" },
   ];
-  return <Layout options={sidebarOptions}><HeroSection /></Layout>;
+
+  const heroSection = {
+    intro: "Hey there!, I'm-",
+    name: "José Marín.",
+    description:
+      "Software engineer who loves new challenges and specializes in building exceptional digital experiences.",
+  };
+
+  return (
+    <Layout options={sidebarOptions}>
+      <HeroSection {...heroSection} />
+    </Layout>
+  );
 }
