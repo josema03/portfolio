@@ -37,9 +37,25 @@ const Sidebar = ({ options }: SidebarProps) => {
               initial="hidden"
               animate="visible"
             >
-              <Typography heading fontSize={{ _: 4, md: 6 }} my={{ _: 4 }}>
-                {option.label}
-              </Typography>
+              <Box my={{ _: 4 }}>
+                <Typography
+                  as="span"
+                  fontColor="textAccent"
+                  fontWeight="700"
+                  fontSize={{ _: "2rem", md: "3rem" }}
+                  my={{ _: 4 }}
+                >
+                  {index + 1}.&nbsp;
+                </Typography>
+                <Typography
+                  as="span"
+                  fontWeight="700"
+                  fontSize={{ _: "2rem", md: "3rem" }}
+                  my={{ _: 4 }}
+                >
+                  {option.label}
+                </Typography>
+              </Box>
             </motion.li>
           );
         })}
