@@ -13,6 +13,9 @@ const sidebarWidthSm = 300;
 const sidebarWidthLg = 600;
 
 const SidebarWrapper = styled(motion.div)`
+  position: fixed;
+  top: 64px;
+  left: 100vw;
   min-width: ${sidebarWidthSm}px;
 
   ${({ theme }) => css`
