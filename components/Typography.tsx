@@ -15,7 +15,7 @@ interface CustomTypographyProps {
 const Typography = (
   props: React.PropsWithChildren<
     (HeadingProps | TextProps) & CustomTypographyProps
-  > = { heading: false, fontColor: "primaryColor" }
+  > = { heading: false, fontColor: "textPrimary" }
 ) => {
   const { heading, fontColor, ...restProps } = { ...props };
   const theme = useContext(ThemeContext);
@@ -25,7 +25,7 @@ const Typography = (
       <Heading
         {...restProps}
         fontFamily={theme.fontFamily.heading}
-        color={theme.colors[fontColor || "primaryColor"]?.textContrast}
+        color={theme.colors[fontColor || "textPrimary"]?.main}
       >
         {props.children}
       </Heading>
@@ -35,7 +35,7 @@ const Typography = (
     <Text
       {...restProps}
       fontFamily={theme.fontFamily.body}
-      color={theme.colors[fontColor || "primaryColor"]?.textContrast}
+      color={theme.colors[fontColor || "textPrimary"]?.main}
     >
       {props.children}
     </Text>
