@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
-import styled from "styled-components";
+import React from "react";
 import { Box } from "rebass/styled-components";
+import styled from "styled-components";
 import HamburgerCloseButton from "./HamburgerCloseButton";
+import Logo from "./Logo";
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -11,6 +12,7 @@ interface NavbarProps {
 const NavbarComponent = styled.nav`
   display: flex;
   position: fixed;
+  z-index: 10;
   top: 0px;
   background: ${({ theme }) => theme.colors.background.main};
   color: ${({ theme }) => theme.colors.background.textContrast};
@@ -19,11 +21,12 @@ const NavbarComponent = styled.nav`
   height: 64px;
   align-items: center;
   justify-content: space-between;
+  opacity: 1;
 
   &::after {
     content: "";
     position: absolute;
-    height: 4px;
+    height: 1px;
     width: 100vw;
     bottom: -1px;
     background: ${({ theme }) =>
@@ -40,7 +43,7 @@ const Navbar = ({ isMenuOpen, setMenuOpen }: NavbarProps) => {
   return (
     <NavbarComponent>
       <Box mx={{ _: 4, md: 6 }} id="logo-and-title">
-        Holis
+        <Logo />
       </Box>
       <Box
         mx={{ _: 4, md: 6 }}
