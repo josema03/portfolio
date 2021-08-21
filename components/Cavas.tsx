@@ -39,7 +39,6 @@ const Canvas = () => {
   const starsRef = useRef<Star[]>([]);
   const lastPaintTimeRef = useRef<number>(0);
   const lastResizeTimeRef = useRef<number>(0);
-  const ms = 16;
 
   const drawStars = (delta: number) => {
     for (let i = 0; i < starsRef.current.length; i++) {
