@@ -12,8 +12,8 @@ const NavbarComponent = styled.nav`
   display: flex;
   position: fixed;
   top: 0px;
-  background: ${({ theme }) => theme.colors.backgroundColor.main};
-  color: ${({ theme }) => theme.colors.backgroundColor.textContrast};
+  background: ${({ theme }) => theme.colors.background.main};
+  color: ${({ theme }) => theme.colors.background.textContrast};
   width: 100vw;
   min-width: 100vw;
   height: 64px;
@@ -27,7 +27,7 @@ const NavbarComponent = styled.nav`
     width: 100vw;
     bottom: -1px;
     background: ${({ theme }) =>
-      `linear-gradient(to right, ${theme.colors.primaryColor.light}, ${theme.colors.primaryColor.dark})`};
+      `linear-gradient(to right, ${theme.colors.primary.light}, ${theme.colors.primary.dark})`};
     z-index: 10;
   }
 

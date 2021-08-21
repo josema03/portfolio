@@ -97,7 +97,7 @@ const Layout = ({
         minHeight="calc(100vh - 64px)"
         mt={{ _: "64px" }}
         overflowX="hidden"
-        backgroundColor={theme.colors.backgroundColor.main}
+        backgroundColor={theme.colors.background.main}
       >
         <motion.div
           variants={contentVariants}
