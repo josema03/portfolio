@@ -3,12 +3,10 @@ import Layout from "../components/Layout";
 
 export default function Home() {
   const sidebarOptions = [
-    { label: "Lorem Ipsum Option" },
-    { label: "Lorem Ipsum Option" },
-    { label: "Lorem Ipsum Option" },
-    { label: "Lorem Ipsum Option" },
-    { label: "Lorem Ipsum Option" },
-    { label: "Lorem Ipsum Option" },
+    { label: "Home" },
+    { label: "About" },
+    { label: "Experience" },
+    { label: "Projects" },
   ];
 
   const heroSection = {
