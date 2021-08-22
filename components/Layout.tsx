@@ -25,18 +25,46 @@ const SidebarWrapper = styled(motion.div)`
   `};
 `;
 
+const NavbarWrapper = styled.nav`
+  position: fixed;
+  z-index: 10;
+  top: 0px;
+  background: ${({ theme }) => theme.colors.background.main};
+  width: 100vw;
+  min-width: 100vw;
+  height: 64px;
+  opacity: 1;
+`;
+
 const contentVariants: Variants = {
   open: {
     x: `-${sidebarWidthSm}px`,
-    opacity: 0.75,
+    opacity: 0.2,
+    transition: {
+      opacity: {
+        duration: 0.1,
+      },
+    },
   },
   openDesktop: {
     x: `-${sidebarWidthLg}px`,
-    opacity: 0.75,
+    opacity: 0.2,
+    transition: {
+      opacity: {
+        duration: 0.1,
+      },
+    },
   },
   close: {
     x: 0,
     opacity: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.15,
+    },
+  },
+  hidden: {
+    opacity: 0,
   },
 };
 
@@ -78,7 +106,7 @@ const Layout = ({
           : undefined;
         await animateContent.start(isLowerThanMd ? "open" : "openDesktop");
       } else {
-        animateContent.start("close");
+        await animateContent.start("close");
       }
     };
     if (!isServerSide) {
@@ -94,17 +122,19 @@ const Layout = ({
 
   return (
     <>
-      <Navbar isMenuOpen={isMenuOpen} setMenuOpen={setMenuOpen} />
+      <NavbarWrapper>
+        <Navbar isMenuOpen={isMenuOpen} setMenuOpen={setMenuOpen} />
+      </NavbarWrapper>
       <Flex
         maxWidth="100vw"
-        minHeight="calc(100vh - 64px)"
+        minHeight="calc(200vh - 64px)"
         mt={{ _: "64px" }}
         overflowX="hidden"
         backgroundColor={theme.colors.background.main}
       >
         <motion.div
           variants={contentVariants}
-          initial={false}
+          initial="hidden"
           animate={animateContent}
         >
           <Box maxWidth="100vw" minWidth="100vw">
