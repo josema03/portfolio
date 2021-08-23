@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 function rand(max: number) {
   return Math.random() * max;
@@ -39,6 +39,7 @@ const Canvas = () => {
   const starsRef = useRef<Star[]>([]);
   const lastPaintTimeRef = useRef<number>(0);
   const lastResizeTimeRef = useRef<number>(0);
+  const [previousWidth, setPreviousWidth] = useState<number>(0);
 
   const drawStars = (delta: number) => {
     for (let i = 0; i < starsRef.current.length; i++) {
@@ -122,12 +123,12 @@ const Canvas = () => {
       initializeStars(canvas);
     }, 500);
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - 64;
+    canvas.height = window.innerHeight + 100;
   };
 
   const starsDraw = (canvas: HTMLCanvasElement) => {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - 64;
+    canvas.height = window.innerHeight + 100;
     initializeStars(canvas);
     requestAnimationFrame(paintLoop);
   };
@@ -135,9 +136,16 @@ const Canvas = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      const resizeCallback = () => resizeFunction(canvas, 500);
+      const resizeCallback = () => {
+        if (window.innerWidth === previousWidth) {
+          return;
+        }
+        setPreviousWidth(window.innerWidth);
+        resizeFunction(canvas, 500);
+      };
       window.addEventListener("resize", resizeCallback);
       starsDraw(canvas);
+      setPreviousWidth(window.innerWidth);
       return () => {
         window.removeEventListener("resize", resizeCallback);
       };
