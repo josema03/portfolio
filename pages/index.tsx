@@ -1,3 +1,4 @@
+import CommonSection from "../components/CommonSection";
 import HeroSection from "../components/HeroSection";
 import Layout from "../components/Layout";
 
@@ -19,6 +20,9 @@ export default function Home() {
   return (
     <Layout options={sidebarOptions}>
       <HeroSection {...heroSection} />
+      <CommonSection index={1} title="About me"></CommonSection>
+      <CommonSection index={2} title="Experience"></CommonSection>
+      <CommonSection index={3} title="Projects"></CommonSection>
     </Layout>
   );
 }
