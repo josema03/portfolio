@@ -1,9 +1,19 @@
-import { AnimatePresence, motion, useAnimation, Variants } from "framer-motion";
-import React, { useContext, useEffect, useState } from "react";
-import { Box, Flex } from "rebass/styled-components";
+import {
+  AnimatePresence,
+  motion,
+  useAnimation,
+  useViewportScroll,
+  Variants,
+} from "framer-motion";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Flex } from "rebass/styled-components";
 import styled, { css, ThemeContext } from "styled-components";
+import useAnimationToggle from "../utils/useAnimationToggle";
+import useBreakpoints from "../utils/useBreakpoint";
 import Navbar from "./Navbar";
 import Sidebar, { SidebarProps } from "./Sidebar";
+import SideSocial from "./SideSocial";
+import Typography from "./Typography";
 
 interface LayoutProps {
   options: SidebarProps["options"];
@@ -25,11 +35,11 @@ const SidebarWrapper = styled(motion.div)`
   `};
 `;
 
-const NavbarWrapper = styled.nav`
+const NavbarWrapper = styled(motion.nav)`
   position: fixed;
   z-index: 10;
   top: 0px;
-  background: ${({ theme }) => theme.colors.background.main};
+  background: transparent;
   width: 100vw;
   min-width: 100vw;
   height: 64px;
@@ -85,27 +95,54 @@ const sidebarVariants: Variants = {
   },
 };
 
+const navbarWrapperVariants: Variants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+  },
+};
+
 const Layout = ({
   children,
   options,
 }: React.PropsWithChildren<LayoutProps>) => {
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
+  const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
+  const [canHideNavbar, setCanHideNavbar] = useState<boolean>(false);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const { isBelowBreakpoint } = useBreakpoints();
+  const { scrollY } = useViewportScroll();
   const animateContent = useAnimation();
+  const animateNavbarWrapper = useAnimationToggle(isNavbarVisible, {
+    initial: "hidden",
+    animate: "visible",
+  });
   const isServerSide = typeof window === "undefined";
   const theme = useContext(ThemeContext);
 
+  const showNavbar = () => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+    !isNavbarVisible && setIsNavbarVisible(true);
+  };
+
+  const hideNavbar = (timeout: number) => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+    const isHeroSection = scrollY.get() < window.innerHeight - 64 * 2;
+    if (isNavbarVisible && canHideNavbar && !isHeroSection) {
+      timeoutRef.current = setTimeout(() => setIsNavbarVisible(false), timeout);
+    }
+  };
+
   useEffect(() => {
     const animateLayout = async () => {
-      if (isMenuOpen) {
-        const breakpoint =
-          typeof theme.breakpoints.md === "string"
-            ? Number(theme.breakpoints.md.split("px")[0])
-            : theme.breakpoints.md;
-        const isLowerThanMd = breakpoint
-          ? window.innerWidth < breakpoint
-          : undefined;
-        await animateContent.start(isLowerThanMd ? "open" : "openDesktop");
+      if (isMenuOpen && isBelowBreakpoint) {
+        const { md: isBelowMd } = isBelowBreakpoint;
+        setCanHideNavbar(false);
+        await animateContent.start(isBelowMd ? "open" : "openDesktop");
       } else {
+        setCanHideNavbar(true);
         await animateContent.start("close");
       }
     };
@@ -114,20 +151,44 @@ const Layout = ({
       animateLayout();
     }
     return () => {
-      if (!isServerSide) {
-        window.removeEventListener("resize", animateLayout);
-      }
+      !isServerSide && window.removeEventListener("resize", animateLayout);
     };
-  }, [isMenuOpen, animateContent, isServerSide, theme.breakpoints]);
+  }, [isMenuOpen, animateContent, isServerSide, isBelowBreakpoint]);
+
+  useEffect(() => {
+    const cancelScrollYSubscription = scrollY.onChange(() => {
+      const current = scrollY.get();
+      const prev = scrollY.getPrevious();
+      if (current < prev) {
+        showNavbar();
+        hideNavbar(2000);
+      } else if (current > prev) {
+        hideNavbar(0);
+      }
+    });
+    return () => cancelScrollYSubscription();
+  }, [isNavbarVisible, canHideNavbar]);
 
   return (
     <>
-      <NavbarWrapper>
-        <Navbar isMenuOpen={isMenuOpen} setMenuOpen={setMenuOpen} />
+      <NavbarWrapper
+        variants={navbarWrapperVariants}
+        initial="hidden"
+        animate={animateNavbarWrapper}
+        onMouseEnter={showNavbar}
+        onClick={showNavbar}
+        onMouseLeave={() => hideNavbar(1000)}
+      >
+        <Navbar
+          isMenuOpen={isMenuOpen}
+          setMenuOpen={setMenuOpen}
+          isNavbarVisible={isNavbarVisible}
+          setIsNavbarVisible={setIsNavbarVisible}
+        />
       </NavbarWrapper>
       <Flex
         maxWidth="100vw"
-        minHeight="calc(200vh - 64px)"
+        minHeight="calc(100vh - 64px)"
         mt={{ _: "64px" }}
         overflowX="hidden"
         backgroundColor={theme.colors.background.main}

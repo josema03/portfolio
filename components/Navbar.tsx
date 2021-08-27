@@ -1,13 +1,16 @@
-import { animate, motion, Variants } from "framer-motion";
+import { animate, motion, useAnimation, Variants } from "framer-motion";
 import React from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled from "styled-components";
+import useAnimationToggle from "../utils/useAnimationToggle";
 import HamburgerCloseButton from "./HamburgerCloseButton";
 import Logo from "./Logo";
 
 interface NavbarProps {
   isMenuOpen: boolean;
   setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isNavbarVisible: boolean;
+  setIsNavbarVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NavbarComponent = styled(Flex)`
@@ -57,9 +60,18 @@ const navbarVariants: Variants = {
   },
 };
 
-const Navbar = ({ isMenuOpen, setMenuOpen }: NavbarProps) => {
+const Navbar = ({ isMenuOpen, setMenuOpen, isNavbarVisible }: NavbarProps) => {
+  const animateNavbar = useAnimationToggle(isNavbarVisible, {
+    initial: "hidden",
+    animate: "visible",
+  });
+
   return (
-    <MotionNavbar variants={navbarVariants} initial="hidden" animate="visible">
+    <MotionNavbar
+      variants={navbarVariants}
+      initial="hidden"
+      animate={animateNavbar}
+    >
       <NavbarComponent
         alignItems="center"
         justifyContent="space-between"
