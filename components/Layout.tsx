@@ -1,12 +1,14 @@
 import {
   AnimatePresence,
+  ForwardRefComponent,
+  HTMLMotionProps,
   motion,
   useAnimation,
   useViewportScroll,
   Variants,
 } from "framer-motion";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Flex } from "rebass/styled-components";
+import { Box, Flex } from "rebass/styled-components";
 import styled, { css, ThemeContext } from "styled-components";
 import useAnimationToggle from "../utils/useAnimationToggle";
 import useBreakpoints from "../utils/useBreakpoint";
@@ -14,7 +16,6 @@ import Navbar from "./Navbar";
 import Sidebar, { SidebarProps } from "./Sidebar";
 import SideEmail from "./SideEmail";
 import SideSocial from "./SideSocial";
-import Typography from "./Typography";
 
 interface LayoutProps {
   options: SidebarProps["options"];
@@ -47,21 +48,21 @@ const NavbarWrapper = styled(motion.nav)`
   opacity: 1;
 `;
 
-const SideSocialWrapper = styled(motion.div)`
-  position: fixed;
-  top: auto;
-  right: auto;
-  bottom: 0px;
-  left: 5vw;
-  background-color: transparent;
+const ContentWrapper = styled(Flex)`
+  position: relative;
 `;
 
-const SideEmailWrapper = styled(motion.div)`
+const SideContentWrapper = styled<
+  ForwardRefComponent<
+    HTMLDivElement,
+    HTMLMotionProps<"div"> & { side: "left" | "right" }
+  >
+>(motion.div)`
   position: fixed;
   top: auto;
-  right: 5vw;
+  right: ${({ side }) => (side === "right" ? "5vw" : "auto")};
   bottom: 0px;
-  left: auto;
+  left: ${({ side }) => (side === "left" ? "5vw" : "auto")};
   background-color: transparent;
 `;
 
@@ -120,6 +121,24 @@ const navbarWrapperVariants: Variants = {
   },
   visible: {
     opacity: 1,
+    transition: {
+      duration: 0.05
+    }
+  },
+};
+
+const sideContentVariants: Variants = {
+  hidden: {
+    y: "100%",
+    transition: {
+      duration: 0.05,
+    },
+  },
+  visible: {
+    y: "0px",
+    transition: {
+      duration: 0.3,
+    },
   },
 };
 
@@ -130,6 +149,7 @@ const Layout = ({
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
   const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
   const [canHideNavbar, setCanHideNavbar] = useState<boolean>(false);
+  const [canShowSideContent, setCanShowSideContent] = useState<boolean>(false);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
@@ -151,6 +171,16 @@ const Layout = ({
     const isHeroSection = scrollY.get() < window.innerHeight - 64 * 2;
     if (isNavbarVisible && canHideNavbar && !isHeroSection) {
       timeoutRef.current = setTimeout(() => setIsNavbarVisible(false), timeout);
+    }
+  };
+
+  const sahowSideContent = () => {
+    const current = scrollY.get();
+    if (current > (window.innerHeight * 3) / 5) {
+      setCanShowSideContent(true);
+    }
+    if (current < (window.innerHeight * 3) / 5) {
+      setCanShowSideContent(false);
     }
   };
 
@@ -181,12 +211,18 @@ const Layout = ({
       if (current < prev) {
         showNavbar();
         hideNavbar(2000);
-      } else if (current > prev) {
+      }
+      if (current > prev) {
         hideNavbar(0);
       }
+      sahowSideContent();
     });
     return () => cancelScrollYSubscription();
   }, [isNavbarVisible, canHideNavbar]);
+
+  useEffect(() => {
+    sahowSideContent();
+  }, []);
 
   return (
     <>
@@ -205,45 +241,62 @@ const Layout = ({
           setIsNavbarVisible={setIsNavbarVisible}
         />
       </NavbarWrapper>
-      <Flex
-        maxWidth="100vw"
-        minHeight="calc(100vh - 64px)"
-        mt={{ _: "64px" }}
-        overflowX="hidden"
-        backgroundColor={theme.colors.background.main}
-      >
+      <Box overflowX="hidden">
         <motion.div
           variants={contentVariants}
           initial="hidden"
           animate={animateContent}
         >
-          {!isBelowBreakpoint?.md && (
-            <SideSocialWrapper>
-              <SideSocial />
-            </SideSocialWrapper>
-          )}
-          <Flex maxWidth="100vw" minWidth="100vw" flexDirection="column">
+          <Flex
+            maxWidth="100vw"
+            minHeight="calc(100vh - 64px)"
+            mt={{ _: "64px" }}
+            overflowX="hidden"
+            backgroundColor={theme.colors.background.main}
+            flexDirection="column"
+          >
             {children}
           </Flex>
-          {!isBelowBreakpoint?.md && (
-            <SideEmailWrapper>
-              <SideEmail />
-            </SideEmailWrapper>
-          )}
         </motion.div>
-        <AnimatePresence>
-          {isMenuOpen && (
-            <SidebarWrapper
-              variants={sidebarVariants}
-              initial="close"
-              animate="open"
-              exit="close"
-            >
-              <Sidebar options={options} />
-            </SidebarWrapper>
-          )}
-        </AnimatePresence>
-      </Flex>
+      </Box>
+      <AnimatePresence>
+        {isMenuOpen && (
+          <SidebarWrapper
+            variants={sidebarVariants}
+            initial="close"
+            animate="open"
+            exit="close"
+          >
+            <Sidebar options={options} />
+          </SidebarWrapper>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {!isBelowBreakpoint?.md && !isMenuOpen && canShowSideContent && (
+          <SideContentWrapper
+            side="left"
+            variants={sideContentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+          >
+            <SideSocial />
+          </SideContentWrapper>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {!isBelowBreakpoint?.md && !isMenuOpen && canShowSideContent && (
+          <SideContentWrapper
+            side="right"
+            variants={sideContentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+          >
+            <SideEmail />
+          </SideContentWrapper>
+        )}
+      </AnimatePresence>
     </>
   );
 };
