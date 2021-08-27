@@ -1,4 +1,5 @@
 import { motion, Variants } from "framer-motion";
+import Link from "next/link";
 import React from "react";
 import { Box, Flex } from "rebass";
 import styled from "styled-components";
@@ -25,14 +26,18 @@ const WriteFromTopToBottom = styled(Box)`
   writing-mode: vertical-lr;
 `;
 
-const SideEmail = () => {
+const SideEmail = ({ email }: { email?: string }) => {
   return (
     <Flex flexDirection="column">
-      <WriteFromTopToBottom my="2">
-        <EmailWrapper>
-          <Typography>jose.marin1997@gmail.com</Typography>
-        </EmailWrapper>
-      </WriteFromTopToBottom>
+      {email && (
+        <WriteFromTopToBottom my="2">
+          <EmailWrapper>
+            <Link href={`mailto:${email}`}>
+              <Typography>{email}</Typography>
+            </Link>
+          </EmailWrapper>
+        </WriteFromTopToBottom>
+      )}
       <VerticalLine />
     </Flex>
   );

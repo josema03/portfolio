@@ -10,6 +10,13 @@ export default function Home() {
     { label: "Projects" },
   ];
 
+  const email = { email: "jose.marin1997@gmail.com" };
+
+  const social = {
+    linkedin: "https://www.linkedin.com/in/joseenriquemarin97/",
+    github: "https://github.com/josema03",
+  };
+
   const heroSection = {
     intro: "Hey there!, I'm-",
     name: "José Marín.",
@@ -18,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <Layout options={sidebarOptions}>
+    <Layout options={sidebarOptions} social={social} email={email}>
       <HeroSection {...heroSection} />
       <CommonSection index={1} title="About me"></CommonSection>
       <CommonSection index={2} title="Experience"></CommonSection>

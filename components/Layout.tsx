@@ -19,6 +19,8 @@ import SideSocial from "./SideSocial";
 
 interface LayoutProps {
   options: SidebarProps["options"];
+  email?: { email: string };
+  social?: { linkedin: string; github: string };
 }
 
 const sidebarWidthSm = 300;
@@ -122,8 +124,8 @@ const navbarWrapperVariants: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      duration: 0.05
-    }
+      duration: 0.05,
+    },
   },
 };
 
@@ -145,6 +147,8 @@ const sideContentVariants: Variants = {
 const Layout = ({
   children,
   options,
+  social,
+  email,
 }: React.PropsWithChildren<LayoutProps>) => {
   const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
   const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
@@ -174,7 +178,7 @@ const Layout = ({
     }
   };
 
-  const sahowSideContent = () => {
+  const showSideContent = () => {
     const current = scrollY.get();
     if (current > (window.innerHeight * 3) / 5) {
       setCanShowSideContent(true);
@@ -215,13 +219,13 @@ const Layout = ({
       if (current > prev) {
         hideNavbar(0);
       }
-      sahowSideContent();
+      showSideContent();
     });
     return () => cancelScrollYSubscription();
   }, [isNavbarVisible, canHideNavbar]);
 
   useEffect(() => {
-    sahowSideContent();
+    showSideContent();
   }, []);
 
   return (
@@ -280,7 +284,7 @@ const Layout = ({
             animate="visible"
             exit="hidden"
           >
-            <SideSocial />
+            <SideSocial {...social} />
           </SideContentWrapper>
         )}
       </AnimatePresence>
@@ -293,7 +297,7 @@ const Layout = ({
             animate="visible"
             exit="hidden"
           >
-            <SideEmail />
+            <SideEmail {...email} />
           </SideContentWrapper>
         )}
       </AnimatePresence>
