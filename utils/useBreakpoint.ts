@@ -1,24 +1,38 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ThemeContext } from "styled-components";
 
-const useBreakpoint = (breakpoint: number) => {
+interface Breakpoints {
+  xs?: number;
+  sm?: number;
+  md?: number;
+  lg?: number;
+  xl?: number;
+}
+
+interface IsBelowBreakpoint {
+  xs?: boolean;
+  sm?: boolean;
+  md?: boolean;
+  lg?: boolean;
+  xl?: boolean;
+}
+
+const useBreakpoints = (breakpoints?: Breakpoints) => {
   const [currentWidth, setCurrentWidth] = useState<number | undefined>(
     undefined
   );
   const [isBelowBreakpoint, setIsBelowBreakpoint] = useState<
-    boolean | undefined
+    IsBelowBreakpoint | undefined
   >(undefined);
+  const theme = useContext(ThemeContext);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const onResize = () => {
         setCurrentWidth(window.innerWidth);
-        setIsBelowBreakpoint(window.innerWidth < breakpoint);
       };
 
-      if (
-        typeof currentWidth === "undefined" ||
-        typeof isBelowBreakpoint === "undefined"
-      ) {
+      if (typeof currentWidth === "undefined") {
         onResize();
       }
 
@@ -30,7 +44,40 @@ const useBreakpoint = (breakpoint: number) => {
     }
   });
 
+  useEffect(() => {
+    if (!!currentWidth) {
+      const breakpointsToMap =
+        breakpoints ??
+        Object.keys(theme.breakpoints)
+          .filter((key) => isNaN(Number(key)))
+          .reduce((breakpointsObj, breakpointKey) => {
+            const breakpointValue =
+              theme.breakpoints[breakpointKey as keyof Breakpoints];
+            breakpointsObj[breakpointKey as keyof Breakpoints] =
+              typeof breakpointValue === "string"
+                ? Number(breakpointValue.split("px")[0])
+                : breakpointValue;
+            return breakpointsObj;
+          }, {} as Breakpoints);
+
+      const isBelowBreakpointValue = Object.keys(breakpointsToMap).reduce(
+        (isBelowBreakpointAcc, breakpointKey) => {
+          const breakpointValue =
+            breakpointsToMap[breakpointKey as keyof Breakpoints];
+          isBelowBreakpointAcc[breakpointKey as keyof IsBelowBreakpoint] =
+            typeof breakpointValue !== "undefined"
+              ? currentWidth < breakpointValue
+              : undefined;
+
+          return isBelowBreakpointAcc;
+        },
+        {} as IsBelowBreakpoint
+      );
+      setIsBelowBreakpoint(isBelowBreakpointValue);
+    }
+  }, [currentWidth]);
+
   return { currentWidth, isBelowBreakpoint };
 };
 
-export default useBreakpoint;
+export default useBreakpoints;
