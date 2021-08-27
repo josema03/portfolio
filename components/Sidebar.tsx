@@ -49,6 +49,7 @@ const Sidebar = ({ options }: SidebarProps) => {
                 </Typography>
                 <Typography
                   as="span"
+                  fontColor="textPrimary"
                   fontWeight="700"
                   fontSize={{ _: "2rem", md: "3rem" }}
                   my={{ _: 4 }}
