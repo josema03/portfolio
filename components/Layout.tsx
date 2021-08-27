@@ -12,6 +12,7 @@ import useAnimationToggle from "../utils/useAnimationToggle";
 import useBreakpoints from "../utils/useBreakpoint";
 import Navbar from "./Navbar";
 import Sidebar, { SidebarProps } from "./Sidebar";
+import SideEmail from "./SideEmail";
 import SideSocial from "./SideSocial";
 import Typography from "./Typography";
 
@@ -44,6 +45,24 @@ const NavbarWrapper = styled(motion.nav)`
   min-width: 100vw;
   height: 64px;
   opacity: 1;
+`;
+
+const SideSocialWrapper = styled(motion.div)`
+  position: fixed;
+  top: auto;
+  right: auto;
+  bottom: 0px;
+  left: 5vw;
+  background-color: transparent;
+`;
+
+const SideEmailWrapper = styled(motion.div)`
+  position: fixed;
+  top: auto;
+  right: 5vw;
+  bottom: 0px;
+  left: auto;
+  background-color: transparent;
 `;
 
 const contentVariants: Variants = {
@@ -198,9 +217,19 @@ const Layout = ({
           initial="hidden"
           animate={animateContent}
         >
-          <Box maxWidth="100vw" minWidth="100vw">
+          {!isBelowBreakpoint?.md && (
+            <SideSocialWrapper>
+              <SideSocial />
+            </SideSocialWrapper>
+          )}
+          <Flex maxWidth="100vw" minWidth="100vw" flexDirection="column">
             {children}
-          </Box>
+          </Flex>
+          {!isBelowBreakpoint?.md && (
+            <SideEmailWrapper>
+              <SideEmail />
+            </SideEmailWrapper>
+          )}
         </motion.div>
         <AnimatePresence>
           {isMenuOpen && (
