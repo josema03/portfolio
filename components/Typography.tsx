@@ -35,7 +35,7 @@ const Typography = (
     <Text
       {...restProps}
       fontFamily={theme.fontFamily.body}
-      color={theme.colors[fontColor || "textPrimary"]?.main}
+      color={typeof fontColor !== "undefined" ? theme.colors[fontColor]!.main : "inherit"}
     >
       {props.children}
     </Text>

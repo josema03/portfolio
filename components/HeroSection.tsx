@@ -2,7 +2,6 @@ import { motion, Variants } from "framer-motion";
 import React from "react";
 import { Box, Flex, Image } from "rebass/styled-components";
 import styled from "styled-components";
-import useBreakpoint from "../utils/useBreakpoint";
 import Canvas from "./Cavas";
 import Typography from "./Typography";
 
@@ -51,7 +50,7 @@ const Faint = styled.div`
 
 const AstronautFaint = styled.div`
   position: absolute;
-  bottom: -5px;
+  bottom: -7.5px;
   left: 0;
   z-index: 1;
   height: 100%;
@@ -85,8 +84,6 @@ const HeroSection = ({
   name,
   description,
 }: HeroSectionProps): JSX.Element => {
-  const { currentWidth, isBelowBreakpoint } = useBreakpoint(768);
-
   return (
     <RelativeBox overflow="hidden" height="calc(100vh - 64px)">
       <Background>
