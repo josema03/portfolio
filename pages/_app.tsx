@@ -1,7 +1,7 @@
-import React from "react";
-import "../styles/globals.css";
 import type { AppProps } from "next/app";
+import React from "react";
 import Theme from "../components/Theme";
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   React.useEffect(() => {
