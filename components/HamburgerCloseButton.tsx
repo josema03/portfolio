@@ -1,5 +1,5 @@
-import { motion, useAnimation, Variants } from "framer-motion";
-import React, { useEffect } from "react";
+import { motion, Variants } from "framer-motion";
+import React from "react";
 import styled from "styled-components";
 import useAnimationToggle from "../utils/useAnimationToggle";
 
@@ -30,7 +30,7 @@ const pathVariants: Variants = {
     strokeDashoffset: "0px",
     transition: {
       ease: "easeOut",
-      duration: 0.6,
+      duration: 0.4,
     },
   },
   closeIcon: {
@@ -38,7 +38,7 @@ const pathVariants: Variants = {
     strokeDashoffset: "-392px",
     transition: {
       ease: "easeOut",
-      duration: 0.6,
+      duration: 0.4,
     },
   },
 };
