@@ -1,10 +1,18 @@
-import { motion, Variants } from "framer-motion";
+import {
+  AnimationControls,
+  motion,
+  useAnimation,
+  Variants
+} from "framer-motion";
 import React from "react";
-import { Box } from "rebass/styled-components";
+import { Box, Flex } from "rebass/styled-components";
+import styled from "styled-components";
 import Typography from "./Typography";
 
 export interface SidebarProps {
   options: { label: string }[];
+  setElementToScrollTo: React.Dispatch<React.SetStateAction<string>>;
+  setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const optionsVariants: Variants = {
@@ -24,11 +32,36 @@ const optionsVariants: Variants = {
   }),
 };
 
-const Sidebar = ({ options }: SidebarProps) => {
+const typographyVariants: Variants = {
+  initial: {
+    x: "0",
+  },
+  onHover: {
+    x: "-25px",
+  },
+};
+
+const TypographyPointer = styled(Typography)`
+  cursor: pointer;
+`;
+
+const Sidebar = ({
+  options,
+  setElementToScrollTo,
+  setMenuOpen,
+}: SidebarProps) => {
+  const animationArray: AnimationControls[] = [];
+  const scrollToElement = (id: string) => {
+    setElementToScrollTo(id);
+    setMenuOpen(false);
+  };
+
   return (
     <Box mt={{ _: 4, md: 5 }}>
       <Box as="ul" pl={{ _: 0 }}>
         {options.map((option, index) => {
+          const id = option.label.toLowerCase().split(" ").join("-");
+          animationArray.push(useAnimation());
           return (
             <motion.li
               custom={{ index }}
@@ -37,26 +70,41 @@ const Sidebar = ({ options }: SidebarProps) => {
               initial="hidden"
               animate="visible"
             >
-              <Box my={{ _: 4 }}>
-                <Typography
-                  as="span"
+              <Flex
+                my={{ _: 4 }}
+                onClick={() => scrollToElement(id)}
+                width="100%"
+              >
+                <TypographyPointer
+                  renderAs={motion.div}
+                  display="flex"
                   fontColor="textAccent"
                   fontWeight="700"
+                  width="50px"
                   fontSize={{ _: "2rem", md: "3rem" }}
-                  my={{ _: 4 }}
+                  variants={typographyVariants}
+                  animate={animationArray[index]}
+                  onMouseEnter={() => animationArray[index].start("onHover")}
+                  onMouseLeave={() => animationArray[index].start("initial")}
                 >
-                  {index + 1}.&nbsp;
-                </Typography>
-                <Typography
-                  as="span"
+                  <Box flex="1" textAlign="center">
+                    {index + 1}
+                  </Box>
+                  <Box>.</Box>
+                </TypographyPointer>
+                <TypographyPointer
+                  renderAs={motion.div}
                   fontColor="textPrimary"
                   fontWeight="700"
                   fontSize={{ _: "2rem", md: "3rem" }}
-                  my={{ _: 4 }}
+                  variants={typographyVariants}
+                  animate={animationArray[index]}
+                  onMouseEnter={() => animationArray[index].start("onHover")}
+                  onMouseLeave={() => animationArray[index].start("initial")}
                 >
-                  {option.label}
-                </Typography>
-              </Box>
+                  &nbsp;{option.label}
+                </TypographyPointer>
+              </Flex>
             </motion.li>
           );
         })}

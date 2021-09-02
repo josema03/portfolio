@@ -33,7 +33,9 @@ const SideEmail = ({ email }: { email?: string }) => {
         <WriteFromTopToBottom my="2">
           <EmailWrapper>
             <Link href={`mailto:${email}`}>
-              <Typography>{email}</Typography>
+              <a>
+                <Typography>{email}</Typography>
+              </a>
             </Link>
           </EmailWrapper>
         </WriteFromTopToBottom>

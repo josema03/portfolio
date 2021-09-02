@@ -5,7 +5,7 @@ const Logo = () => {
   return (
     <>
       <Typography
-        as="span"
+        renderAs="span"
         fontSize={{ _: 3 }}
         fontWeight="700"
         fontColor="textSecondary"
@@ -13,11 +13,11 @@ const Logo = () => {
       >
         {"{"}
       </Typography>
-      <Typography as="span" fontSize={{ _: 3 }} fontWeight="700" mx="2">
+      <Typography renderAs="span" fontSize={{ _: 3 }} fontWeight="700" mx="2">
         JM
       </Typography>
       <Typography
-        as="span"
+        renderAs="span"
         fontSize={{ _: 3 }}
         fontWeight="700"
         fontColor="textSecondary"

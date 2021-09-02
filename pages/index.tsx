@@ -4,7 +4,6 @@ import Layout from "../components/Layout";
 
 export default function Home() {
   const sidebarOptions = [
-    { label: "Home" },
     { label: "About" },
     { label: "Experience" },
     { label: "Projects" },
@@ -27,7 +26,7 @@ export default function Home() {
   return (
     <Layout options={sidebarOptions} social={social} email={email}>
       <HeroSection {...heroSection} />
-      <CommonSection index={1} title="About me"></CommonSection>
+      <CommonSection index={1} title="About"></CommonSection>
       <CommonSection index={2} title="Experience"></CommonSection>
       <CommonSection index={3} title="Projects"></CommonSection>
     </Layout>

@@ -1,45 +1,32 @@
+import { MotionProps } from "framer-motion";
 import React, { useContext } from "react";
-import {
-  Heading,
-  HeadingProps,
-  Text,
-  TextProps,
-} from "rebass/styled-components";
+import { BaseProps, Text, TextProps } from "rebass/styled-components";
 import { DefaultTheme, ThemeContext } from "styled-components";
 
-interface CustomTypographyProps {
-  heading?: boolean;
+interface CustomTypographyProps extends TextProps {
   fontColor?: keyof DefaultTheme["colors"];
+  renderAs?: BaseProps["as"];
 }
 
-const Typography = (
-  props: React.PropsWithChildren<
-    (HeadingProps | TextProps) & CustomTypographyProps
-  > = { heading: false, fontColor: "textPrimary" }
-) => {
-  const { heading, fontColor, ...restProps } = { ...props };
-  const theme = useContext(ThemeContext);
+const Typography: React.FunctionComponent<CustomTypographyProps & MotionProps> =
+  (props) => {
+    const { fontColor, renderAs, ...restProps } = { ...props };
+    const theme = useContext(ThemeContext);
 
-  if (props.heading) {
     return (
-      <Heading
+      <Text
         {...restProps}
-        fontFamily={theme.fontFamily.heading}
-        color={theme.colors[fontColor || "textPrimary"]?.main}
+        as={renderAs || "div"}
+        fontFamily={theme.fontFamily.body}
+        color={
+          typeof fontColor !== "undefined"
+            ? theme.colors[fontColor]!.main
+            : "inherit"
+        }
       >
         {props.children}
-      </Heading>
+      </Text>
     );
-  }
-  return (
-    <Text
-      {...restProps}
-      fontFamily={theme.fontFamily.body}
-      color={typeof fontColor !== "undefined" ? theme.colors[fontColor]!.main : "inherit"}
-    >
-      {props.children}
-    </Text>
-  );
-};
+  };
 
 export default Typography;

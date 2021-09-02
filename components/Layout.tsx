@@ -154,6 +154,7 @@ const Layout = ({
   const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
   const [canHideNavbar, setCanHideNavbar] = useState<boolean>(false);
   const [canShowSideContent, setCanShowSideContent] = useState<boolean>(false);
+  const [elementToScrollTo, setElementToScrollTo] = useState<string>("");
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
@@ -185,6 +186,15 @@ const Layout = ({
     }
     if (current < (window.innerHeight * 3) / 5) {
       setCanShowSideContent(false);
+    }
+  };
+
+  const scrollToElement = () => {
+    if (elementToScrollTo !== "") {
+      document
+        .getElementById(elementToScrollTo)
+        ?.scrollIntoView({ behavior: "smooth" });
+      setElementToScrollTo("");
     }
   };
 
@@ -263,7 +273,7 @@ const Layout = ({
           </Flex>
         </motion.div>
       </Box>
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={scrollToElement}>
         {isMenuOpen && (
           <SidebarWrapper
             variants={sidebarVariants}
@@ -271,7 +281,11 @@ const Layout = ({
             animate="open"
             exit="close"
           >
-            <Sidebar options={options} />
+            <Sidebar
+              options={options}
+              setElementToScrollTo={setElementToScrollTo}
+              setMenuOpen={setMenuOpen}
+            />
           </SidebarWrapper>
         )}
       </AnimatePresence>
