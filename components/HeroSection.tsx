@@ -85,7 +85,7 @@ const HeroSection = ({
   description,
 }: HeroSectionProps): JSX.Element => {
   return (
-    <RelativeBox overflow="hidden" height="calc(100vh - 64px)">
+    <RelativeBox overflow="hidden" height="calc(100vh - 64px)" id="home">
       <Background>
         <Faint />
         <Canvas />

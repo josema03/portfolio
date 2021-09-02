@@ -22,6 +22,7 @@ const CommonSection = ({
       mx="auto"
       px={{ _: 4, md: 5 }}
       py={{ _: 5, md: 6 }}
+      id={title.toLowerCase().split(" ").join("-")}
     >
       <Box py={{ _: 5, md: 6 }}>
         <Flex alignItems="center">
