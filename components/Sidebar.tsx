@@ -2,11 +2,12 @@ import {
   AnimationControls,
   motion,
   useAnimation,
-  Variants
+  Variants,
 } from "framer-motion";
 import React from "react";
-import { Box, Flex } from "rebass/styled-components";
+import { Box } from "rebass/styled-components";
 import styled from "styled-components";
+import SidebarOption from "./SidebarOption";
 import Typography from "./Typography";
 
 export interface SidebarProps {
@@ -32,25 +33,11 @@ const optionsVariants: Variants = {
   }),
 };
 
-const typographyVariants: Variants = {
-  initial: {
-    x: "0",
-  },
-  onHover: {
-    x: "-25px",
-  },
-};
-
-const TypographyPointer = styled(Typography)`
-  cursor: pointer;
-`;
-
 const Sidebar = ({
   options,
   setElementToScrollTo,
   setMenuOpen,
 }: SidebarProps) => {
-  const animationArray: AnimationControls[] = [];
   const scrollToElement = (id: string) => {
     setElementToScrollTo(id);
     setMenuOpen(false);
@@ -61,7 +48,6 @@ const Sidebar = ({
       <Box as="ul" pl={{ _: 0 }}>
         {options.map((option, index) => {
           const id = option.label.toLowerCase().split(" ").join("-");
-          animationArray.push(useAnimation());
           return (
             <motion.li
               custom={{ index }}
@@ -70,41 +56,12 @@ const Sidebar = ({
               initial="hidden"
               animate="visible"
             >
-              <Flex
-                my={{ _: 4 }}
-                onClick={() => scrollToElement(id)}
-                width="100%"
-              >
-                <TypographyPointer
-                  renderAs={motion.div}
-                  display="flex"
-                  fontColor="textAccent"
-                  fontWeight="700"
-                  width="50px"
-                  fontSize={{ _: "2rem", md: "3rem" }}
-                  variants={typographyVariants}
-                  animate={animationArray[index]}
-                  onMouseEnter={() => animationArray[index].start("onHover")}
-                  onMouseLeave={() => animationArray[index].start("initial")}
-                >
-                  <Box flex="1" textAlign="center">
-                    {index + 1}
-                  </Box>
-                  <Box>.</Box>
-                </TypographyPointer>
-                <TypographyPointer
-                  renderAs={motion.div}
-                  fontColor="textPrimary"
-                  fontWeight="700"
-                  fontSize={{ _: "2rem", md: "3rem" }}
-                  variants={typographyVariants}
-                  animate={animationArray[index]}
-                  onMouseEnter={() => animationArray[index].start("onHover")}
-                  onMouseLeave={() => animationArray[index].start("initial")}
-                >
-                  &nbsp;{option.label}
-                </TypographyPointer>
-              </Flex>
+              <SidebarOption
+                option={option}
+                index={index}
+                id={id}
+                scrollToElement={scrollToElement}
+              />
             </motion.li>
           );
         })}
