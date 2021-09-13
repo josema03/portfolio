@@ -3,11 +3,22 @@ import HeroSection from "../components/HeroSection";
 import Layout from "../components/Layout";
 
 export default function Home() {
-  const sidebarOptions = [
-    { label: "About" },
-    { label: "Experience" },
-    { label: "Projects" },
+  const heroSection = {
+    intro: "Hey there!, I'm-",
+    name: "José Marín.",
+    description:
+      "Software engineer who loves new challenges and specializes in building exceptional digital experiences.",
+  };
+
+  const pageContent = [
+    { title: "About", component: <div></div> },
+    { title: "Experience", component: <div></div> },
+    { title: "Projects", component: <div></div> },
   ];
+
+  const sidebarOptions = pageContent.map((section) => ({
+    label: section.title,
+  }));
 
   const email = { email: "jose.marin1997@gmail.com" };
 
@@ -16,19 +27,18 @@ export default function Home() {
     github: "https://github.com/josema03",
   };
 
-  const heroSection = {
-    intro: "Hey there!, I'm-",
-    name: "José Marín.",
-    description:
-      "Software engineer who loves new challenges and specializes in building exceptional digital experiences.",
-  };
-
   return (
     <Layout options={sidebarOptions} social={social} email={email}>
       <HeroSection {...heroSection} />
-      <CommonSection index={1} title="About"></CommonSection>
-      <CommonSection index={2} title="Experience"></CommonSection>
-      <CommonSection index={3} title="Projects"></CommonSection>
+      {pageContent.map((section, index) => (
+        <CommonSection
+          index={index + 1}
+          title={section.title}
+          key={`${section.title}-${index}`}
+        >
+          {section.component}
+        </CommonSection>
+      ))}
     </Layout>
   );
 }

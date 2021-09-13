@@ -66,6 +66,12 @@ const Navbar = ({ isMenuOpen, setMenuOpen, isNavbarVisible }: NavbarProps) => {
     animate: "visible",
   });
 
+  const scrollToTop = () => {
+    document
+      .getElementsByTagName("body")[0]
+      ?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <MotionNavbar
       variants={navbarVariants}
@@ -78,7 +84,7 @@ const Navbar = ({ isMenuOpen, setMenuOpen, isNavbarVisible }: NavbarProps) => {
         width="100%"
         height="100%"
       >
-        <Box mx={{ _: 4, md: 6 }} id="logo-and-title">
+        <Box mx={{ _: 4, md: 6 }} id="logo-and-title" onClick={scrollToTop}>
           <Logo />
         </Box>
         <Box
