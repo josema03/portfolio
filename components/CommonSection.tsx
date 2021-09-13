@@ -1,5 +1,5 @@
 import { motion, useTransform, useViewportScroll } from "framer-motion";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled from "styled-components";
 import Typography from "./Typography";
@@ -10,7 +10,10 @@ interface CommonSectionProps {
 }
 
 const MotionWrapper = styled(motion.div)`
-  transform-origin: center top;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: red;
 `;
 
 const CommonSection = ({
@@ -36,20 +39,41 @@ const CommonSection = ({
     motionRange.input,
     motionRange.output.scale
   );
+  const [componentHeight, setComponentHeight] = useState(0);
+
+  const getComponentHeight = useCallback((node) => {
+    const { scrollHeight } = node;
+    setComponentHeight(scrollHeight);
+  }, []);
 
   const setMotionTransformValues = useCallback((node: HTMLElement) => {
+    if (motionRange.input.length > 2) return;
     const { offsetTop, scrollHeight } = node;
     setMotionRange({
       input: [
         0,
-        offsetTop - scrollHeight * 0.25,
-        offsetTop - scrollHeight * 0.1,
-        offsetTop + scrollHeight * 0.85,
+        offsetTop,
+        offsetTop + 200,
+        offsetTop + scrollHeight - 200,
         offsetTop + scrollHeight,
       ],
-      output: { opacity: [0, 0, 1, 1, 0], scale: [0, 0, 1, 1, 0] },
+      output: { opacity: [0, 1, 1, 1, 0], scale: [0, 0, 1, 1, 0] },
     });
   }, []);
+
+  useEffect(() => {
+    const falseElement = document.getElementById(
+      title.toLowerCase().split(" ").join("-").concat("false")
+    );
+    const observer = new MutationObserver((_, observer) => {
+      falseElement && setMotionTransformValues(falseElement);
+    });
+    observer.observe(falseElement!, {
+      childList: false,
+      characterData: false,
+      attributes: true,
+    });
+  });
 
   return (
     <>
@@ -69,7 +93,7 @@ const CommonSection = ({
             px={{ _: 4, md: 5 }}
             py={{ _: 2, md: 4 }}
             id={title.toLowerCase().split(" ").join("-")}
-            ref={setMotionTransformValues}
+            ref={getComponentHeight}
           >
             <Box py={{ _: 5, md: 6 }}>
               <Flex alignItems="center">
@@ -104,6 +128,10 @@ const CommonSection = ({
           </Box>
         </Box>
       </MotionWrapper>
+      <Box
+        height={componentHeight}
+        id={title.toLowerCase().split(" ").join("-").concat("false")}
+      ></Box>
     </>
   );
 };

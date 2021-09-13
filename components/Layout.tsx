@@ -50,10 +50,6 @@ const NavbarWrapper = styled(motion.nav)`
   opacity: 1;
 `;
 
-const ContentWrapper = styled(Flex)`
-  position: relative;
-`;
-
 const SideContentWrapper = styled<
   ForwardRefComponent<
     HTMLDivElement,
@@ -159,6 +155,7 @@ const Layout = ({
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
   const animateContent = useAnimation();
+  const animateSidebar = useAnimation();
   const animateNavbarWrapper = useAnimationToggle(isNavbarVisible, {
     initial: "hidden",
     animate: "visible",
@@ -203,9 +200,11 @@ const Layout = ({
       if (isMenuOpen && isBelowBreakpoint) {
         const { md: isBelowMd } = isBelowBreakpoint;
         setCanHideNavbar(false);
+        animateSidebar.start("open");
         await animateContent.start(isBelowMd ? "open" : "openDesktop");
       } else {
         setCanHideNavbar(true);
+        animateSidebar.start("close");
         await animateContent.start("close");
       }
     };
@@ -273,22 +272,17 @@ const Layout = ({
           </Flex>
         </motion.div>
       </Box>
-      <AnimatePresence onExitComplete={scrollToElement}>
-        {isMenuOpen && (
-          <SidebarWrapper
-            variants={sidebarVariants}
-            initial="close"
-            animate="open"
-            exit="close"
-          >
-            <Sidebar
-              options={options}
-              setElementToScrollTo={setElementToScrollTo}
-              setMenuOpen={setMenuOpen}
-            />
-          </SidebarWrapper>
-        )}
-      </AnimatePresence>
+      <SidebarWrapper
+        variants={sidebarVariants}
+        initial="close"
+        animate={animateSidebar}
+      >
+        <Sidebar
+          options={options}
+          setElementToScrollTo={setElementToScrollTo}
+          setMenuOpen={setMenuOpen}
+        />
+      </SidebarWrapper>
       <AnimatePresence>
         {!isBelowBreakpoint?.md && !isMenuOpen && canShowSideContent && (
           <SideContentWrapper
