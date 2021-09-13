@@ -28,8 +28,10 @@ export default function Home() {
   };
 
   return (
-    <Layout options={sidebarOptions} social={social} email={email}>
-      <HeroSection {...heroSection} />
+    <>
+      <Layout options={sidebarOptions} social={social} email={email}>
+        <HeroSection {...heroSection} />
+      </Layout>
       {pageContent.map((section, index) => (
         <CommonSection
           index={index + 1}
@@ -39,6 +41,6 @@ export default function Home() {
           {section.component}
         </CommonSection>
       ))}
-    </Layout>
+    </>
   );
 }
