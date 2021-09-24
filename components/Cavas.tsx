@@ -150,7 +150,7 @@ const Canvas = () => {
         window.removeEventListener("resize", resizeCallback);
       };
     }
-  });
+  }, []);
 
   return <canvas ref={canvasRef} />;
 };
