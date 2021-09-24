@@ -1,7 +1,14 @@
 import { motion, useTransform, useViewportScroll } from "framer-motion";
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled from "styled-components";
+import { LayoutState } from "../pages";
 import Typography from "./Typography";
 
 interface CommonSectionProps {
@@ -13,7 +20,7 @@ const MotionWrapper = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
-  background-color: red;
+  z-index: 0;
 `;
 
 const CommonSection = ({
@@ -21,6 +28,7 @@ const CommonSection = ({
   title,
   children,
 }: React.PropsWithChildren<CommonSectionProps>) => {
+  const { sidebarTranslationX } = useContext(LayoutState);
   const [motionRange, setMotionRange] = useState({
     input: [0, 1],
     output: {
@@ -40,6 +48,10 @@ const CommonSection = ({
     motionRange.output.scale
   );
   const [componentHeight, setComponentHeight] = useState(0);
+  const componentId = useRef(title.toLowerCase().split(" ").join("-")).current;
+  const placeholderId = useRef(
+    title.toLowerCase().split(" ").concat("placeholder").join("-")
+  ).current;
 
   const getComponentHeight = useCallback((node) => {
     const { scrollHeight } = node;
@@ -49,26 +61,25 @@ const CommonSection = ({
   const setMotionTransformValues = useCallback((node: HTMLElement) => {
     if (motionRange.input.length > 2) return;
     const { offsetTop, scrollHeight } = node;
+    const { innerHeight } = window;
     setMotionRange({
       input: [
         0,
+        offsetTop - innerHeight * 0.15,
         offsetTop,
-        offsetTop + 200,
-        offsetTop + scrollHeight - 200,
-        offsetTop + scrollHeight,
+        offsetTop + scrollHeight - innerHeight * 0.7,
+        offsetTop + scrollHeight - innerHeight * 0.15,
       ],
       output: { opacity: [0, 1, 1, 1, 0], scale: [0, 0, 1, 1, 0] },
     });
   }, []);
 
   useEffect(() => {
-    const falseElement = document.getElementById(
-      title.toLowerCase().split(" ").join("-").concat("false")
-    );
+    const placeholderElement = document.getElementById(placeholderId);
     const observer = new MutationObserver((_, observer) => {
-      falseElement && setMotionTransformValues(falseElement);
+      placeholderElement && setMotionTransformValues(placeholderElement);
     });
-    observer.observe(falseElement!, {
+    observer.observe(placeholderElement!, {
       childList: false,
       characterData: false,
       attributes: true,
@@ -81,6 +92,7 @@ const CommonSection = ({
         style={{
           opacity: opacityMotionValue,
           scale: scaleMotionValue,
+          translateX: sidebarTranslationX,
         }}
       >
         <Box minWidth="100vw">
@@ -92,7 +104,7 @@ const CommonSection = ({
             mx="auto"
             px={{ _: 4, md: 5 }}
             py={{ _: 2, md: 4 }}
-            id={title.toLowerCase().split(" ").join("-")}
+            id={componentId}
             ref={getComponentHeight}
           >
             <Box py={{ _: 5, md: 6 }}>
@@ -128,10 +140,7 @@ const CommonSection = ({
           </Box>
         </Box>
       </MotionWrapper>
-      <Box
-        height={componentHeight}
-        id={title.toLowerCase().split(" ").join("-").concat("false")}
-      ></Box>
+      <Box height={componentHeight} id={placeholderId}></Box>
     </>
   );
 };

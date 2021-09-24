@@ -1,14 +1,13 @@
-import { animate, motion, useAnimation, Variants } from "framer-motion";
-import React from "react";
+import { motion, Variants } from "framer-motion";
+import React, { useContext } from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled from "styled-components";
+import { LayoutState } from "../pages";
 import useAnimationToggle from "../utils/useAnimationToggle";
 import HamburgerCloseButton from "./HamburgerCloseButton";
 import Logo from "./Logo";
 
 interface NavbarProps {
-  isMenuOpen: boolean;
-  setMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isNavbarVisible: boolean;
   setIsNavbarVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -60,7 +59,8 @@ const navbarVariants: Variants = {
   },
 };
 
-const Navbar = ({ isMenuOpen, setMenuOpen, isNavbarVisible }: NavbarProps) => {
+const Navbar = ({ isNavbarVisible }: NavbarProps) => {
+  const { isMenuOpen, setIsMenuOpen } = useContext(LayoutState);
   const animateNavbar = useAnimationToggle(isNavbarVisible, {
     initial: "hidden",
     animate: "visible",
@@ -90,9 +90,9 @@ const Navbar = ({ isMenuOpen, setMenuOpen, isNavbarVisible }: NavbarProps) => {
         <Box
           mx={{ _: 4, md: 6 }}
           id="hamburger-close-icon"
-          onClick={() => setMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          <HamburgerCloseButton isMenuOpen={isMenuOpen} />
+          <HamburgerCloseButton />
         </Box>
       </NavbarComponent>
     </MotionNavbar>

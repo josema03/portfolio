@@ -1,8 +1,41 @@
+import { MotionValue, useSpring } from "framer-motion";
+import { createContext, Dispatch, SetStateAction, useState } from "react";
 import CommonSection from "../components/CommonSection";
 import HeroSection from "../components/HeroSection";
 import Layout from "../components/Layout";
 
+interface LayoutStateInterface {
+  isMenuOpen: boolean;
+  setIsMenuOpen: Dispatch<SetStateAction<boolean>>;
+  sidebarWidth: number;
+  setSidebarWidth: Dispatch<SetStateAction<number>>;
+  sidebarTranslationX: MotionValue<number>;
+}
+
+export const LayoutState = createContext<LayoutStateInterface>({
+  isMenuOpen: false,
+  setIsMenuOpen: () => {},
+  sidebarWidth: 0,
+  setSidebarWidth: () => {},
+  sidebarTranslationX: new MotionValue(0),
+});
+
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(0);
+  const sidebarTranslationX = useSpring(0, {
+    stiffness: 150,
+    damping: 5,
+    mass: 0.15,
+  });
+  const layoutState = {
+    isMenuOpen,
+    setIsMenuOpen,
+    sidebarWidth,
+    setSidebarWidth,
+    sidebarTranslationX,
+  };
+
   const heroSection = {
     intro: "Hey there!, I'm-",
     name: "José Marín.",
@@ -28,7 +61,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <LayoutState.Provider value={layoutState}>
       <Layout options={sidebarOptions} social={social} email={email}>
         <HeroSection {...heroSection} />
       </Layout>
@@ -41,6 +74,6 @@ export default function Home() {
           {section.component}
         </CommonSection>
       ))}
-    </>
+    </LayoutState.Provider>
   );
 }

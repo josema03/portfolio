@@ -3,13 +3,13 @@ import {
   ForwardRefComponent,
   HTMLMotionProps,
   motion,
-  useAnimation,
   useViewportScroll,
   Variants,
 } from "framer-motion";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled, { css, ThemeContext } from "styled-components";
+import { LayoutState } from "../pages";
 import useAnimationToggle from "../utils/useAnimationToggle";
 import useBreakpoints from "../utils/useBreakpoint";
 import Navbar from "./Navbar";
@@ -30,11 +30,12 @@ const SidebarWrapper = styled(motion.div)`
   position: fixed;
   top: 64px;
   left: 100vw;
-  min-width: ${sidebarWidthSm}px;
+  width: ${sidebarWidthSm}px;
+  z-index: 10;
 
   ${({ theme }) => css`
     @media (min-width: ${theme.breakpoints.md}) {
-      min-width: ${sidebarWidthLg}px;
+      width: ${sidebarWidthLg}px;
     }
   `};
 `;
@@ -62,56 +63,8 @@ const SideContentWrapper = styled<
   bottom: 0px;
   left: ${({ side }) => (side === "left" ? "5vw" : "auto")};
   background-color: transparent;
+  z-index: 10;
 `;
-
-const contentVariants: Variants = {
-  open: {
-    x: `-${sidebarWidthSm}px`,
-    opacity: 0.2,
-    transition: {
-      opacity: {
-        duration: 0.1,
-      },
-    },
-  },
-  openDesktop: {
-    x: `-${sidebarWidthLg}px`,
-    opacity: 0.2,
-    transition: {
-      opacity: {
-        duration: 0.1,
-      },
-    },
-  },
-  close: {
-    x: 0,
-    opacity: 1,
-    transition: {
-      when: "beforeChildren",
-      staggerChildren: 0.15,
-    },
-  },
-  hidden: {
-    opacity: 0,
-  },
-};
-
-const sidebarVariants: Variants = {
-  open: {
-    x: "-100%",
-    transition: {
-      when: "beforeChildren",
-      staggerChildren: 3,
-    },
-  },
-  close: {
-    x: "100%",
-    transition: {
-      when: "beforeChildren",
-      staggerChildren: 0.15,
-    },
-  },
-};
 
 const navbarWrapperVariants: Variants = {
   hidden: {
@@ -146,7 +99,8 @@ const Layout = ({
   social,
   email,
 }: React.PropsWithChildren<LayoutProps>) => {
-  const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
+  const { isMenuOpen, sidebarTranslationX, setSidebarWidth } =
+    useContext(LayoutState);
   const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
   const [canHideNavbar, setCanHideNavbar] = useState<boolean>(false);
   const [canShowSideContent, setCanShowSideContent] = useState<boolean>(false);
@@ -154,8 +108,6 @@ const Layout = ({
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
-  const animateContent = useAnimation();
-  const animateSidebar = useAnimation();
   const animateNavbarWrapper = useAnimationToggle(isNavbarVisible, {
     initial: "hidden",
     animate: "visible",
@@ -200,12 +152,12 @@ const Layout = ({
       if (isMenuOpen && isBelowBreakpoint) {
         const { md: isBelowMd } = isBelowBreakpoint;
         setCanHideNavbar(false);
-        animateSidebar.start("open");
-        await animateContent.start(isBelowMd ? "open" : "openDesktop");
+        setSidebarWidth(isBelowMd ? -sidebarWidthSm : -sidebarWidthLg);
+        sidebarTranslationX.set(isBelowMd ? -sidebarWidthSm : -sidebarWidthLg);
       } else {
         setCanHideNavbar(true);
-        animateSidebar.start("close");
-        await animateContent.start("close");
+        sidebarTranslationX.set(0);
+        scrollToElement();
       }
     };
     if (!isServerSide) {
@@ -215,7 +167,7 @@ const Layout = ({
     return () => {
       !isServerSide && window.removeEventListener("resize", animateLayout);
     };
-  }, [isMenuOpen, animateContent, isServerSide, isBelowBreakpoint]);
+  }, [isMenuOpen, isServerSide, isBelowBreakpoint]);
 
   useEffect(() => {
     const cancelScrollYSubscription = scrollY.onChange(() => {
@@ -248,18 +200,12 @@ const Layout = ({
         onMouseLeave={() => hideNavbar(1000)}
       >
         <Navbar
-          isMenuOpen={isMenuOpen}
-          setMenuOpen={setMenuOpen}
           isNavbarVisible={isNavbarVisible}
           setIsNavbarVisible={setIsNavbarVisible}
         />
       </NavbarWrapper>
       <Box overflowX="hidden">
-        <motion.div
-          variants={contentVariants}
-          initial="hidden"
-          animate={animateContent}
-        >
+        <motion.div style={{ translateX: sidebarTranslationX }}>
           <Flex
             maxWidth="100vw"
             minHeight="calc(100vh - 64px)"
@@ -272,15 +218,10 @@ const Layout = ({
           </Flex>
         </motion.div>
       </Box>
-      <SidebarWrapper
-        variants={sidebarVariants}
-        initial="close"
-        animate={animateSidebar}
-      >
+      <SidebarWrapper style={{ translateX: sidebarTranslationX }}>
         <Sidebar
           options={options}
           setElementToScrollTo={setElementToScrollTo}
-          setMenuOpen={setMenuOpen}
         />
       </SidebarWrapper>
       <AnimatePresence>

@@ -1,11 +1,8 @@
 import { motion, Variants } from "framer-motion";
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
+import { LayoutState } from "../pages";
 import useAnimationToggle from "../utils/useAnimationToggle";
-
-interface HamburgerCloseButton {
-  isMenuOpen: boolean;
-}
 
 const HamburgerCloseIcon = styled.div`
   svg {
@@ -48,7 +45,8 @@ const middleLineVariants: Variants = {
   closeIcon: { strokeDasharray: "50px 60px", strokeDashoffset: "51px" },
 };
 
-const HamburgerCloseButton = ({ isMenuOpen }: HamburgerCloseButton) => {
+const HamburgerCloseButton = () => {
+  const { isMenuOpen } = useContext(LayoutState);
   const animateIcon = useAnimationToggle(isMenuOpen, {
     initial: "hamburgerIcon",
     animate: "closeIcon",
