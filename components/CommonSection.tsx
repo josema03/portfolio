@@ -1,10 +1,4 @@
-import {
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  useTransform,
-  useViewportScroll,
-} from "framer-motion";
+import { motion, useTransform, useViewportScroll } from "framer-motion";
 import React, {
   useCallback,
   useContext,
@@ -15,6 +9,7 @@ import React, {
 import { Box, Flex } from "rebass/styled-components";
 import styled from "styled-components";
 import { LayoutState } from "../pages";
+import useBreakpoints from "../utils/useBreakpoint";
 import Typography from "./Typography";
 
 interface CommonSectionProps {
@@ -28,6 +23,7 @@ const MotionWrapper = styled(motion.div)`
   bottom: auto;
   left: 0;
   z-index: 0;
+  transform-origin: top center;
 `;
 
 const CommonSection = ({
@@ -36,12 +32,14 @@ const CommonSection = ({
   children,
 }: React.PropsWithChildren<CommonSectionProps>) => {
   const { sidebarTranslationX } = useContext(LayoutState);
+  const { currentWidth, currentHeight } = useBreakpoints();
   const [motionRange, setMotionRange] = useState({
     input: [0, 1],
     output: {
       opacity: [0, 0],
       scale: [1, 1],
       progress: [0, 1],
+      translateY: [0, 0],
     },
   });
   const { scrollY } = useViewportScroll();
@@ -55,12 +53,16 @@ const CommonSection = ({
     motionRange.input,
     motionRange.output.scale
   );
+  const translateYMotionValue = useTransform(
+    scrollY,
+    motionRange.input,
+    motionRange.output.translateY
+  );
   const componentScrollProgress = useTransform(
     scrollY,
     motionRange.input,
     motionRange.output.progress
   );
-  const componentTransformOrigin = useMotionValue("bottom center");
   const [componentHeight, setComponentHeight] = useState(0);
   const componentId = useRef(title.toLowerCase().split(" ").join("-")).current;
   const placeholderId = useRef(
@@ -68,52 +70,36 @@ const CommonSection = ({
   ).current;
 
   const getComponentHeight = useCallback((node) => {
+    if (!node) return;
     const { scrollHeight } = node;
     setComponentHeight(scrollHeight * 2);
   }, []);
 
   const setMotionTransformValues = useCallback((node: HTMLElement) => {
-    if (motionRange.input.length > 2) return;
+    if (!node) return;
     const { offsetTop, scrollHeight } = node;
     const { innerHeight } = window;
     setMotionRange({
       input: [
         0,
-        offsetTop - innerHeight * 0.75,
-        offsetTop,
-        offsetTop + scrollHeight - innerHeight * 0.75,
+        offsetTop - innerHeight - 64,
+        offsetTop - 64,
+        offsetTop + scrollHeight - innerHeight,
         offsetTop + scrollHeight,
       ],
       output: {
         opacity: [1, 1, 1, 1, 0],
-        scale: [0, 0, 1, 1, 0],
+        scale: [1, 1, 1, 1, 0],
         progress: [0, 0, 0, 1, 1],
+        translateY: [innerHeight, innerHeight, 0, 0, 0],
       },
     });
   }, []);
 
   useEffect(() => {
     const placeholderElement = document.getElementById(placeholderId);
-
-    const observer = new MutationObserver((_, observer) => {
-      !!placeholderElement && setMotionTransformValues(placeholderElement);
-    });
-
-    !!placeholderElement &&
-      observer.observe(placeholderElement, {
-        childList: false,
-        characterData: false,
-        attributes: true,
-      });
-  }, []);
-
-  useEffect(() => {
-    const cancelSubscription = componentScrollProgress.onChange((value) => {
-      value < 0.5 && componentTransformOrigin.set("bottom center");
-      value > 0.5 && componentTransformOrigin.set("top center");
-    });
-    return () => cancelSubscription();
-  }, [componentScrollProgress]);
+    !!placeholderElement && setMotionTransformValues(placeholderElement);
+  }, [currentHeight, currentWidth]);
 
   return (
     <>
@@ -122,7 +108,7 @@ const CommonSection = ({
           opacity: opacityMotionValue,
           scale: scaleMotionValue,
           translateX: sidebarTranslationX,
-          transformOrigin: componentTransformOrigin,
+          translateY: translateYMotionValue,
         }}
       >
         <Box minWidth="100vw">
@@ -163,7 +149,10 @@ const CommonSection = ({
                 />
               </Flex>
             </Flex>
-            {children}
+            {React.Children.map(children, (child) => {
+              React.isValidElement(child) &&
+                React.cloneElement(child, { componentScrollProgress });
+            })}
           </Box>
         </Box>
       </MotionWrapper>

@@ -21,6 +21,9 @@ const useBreakpoints = (breakpoints?: Breakpoints) => {
   const [currentWidth, setCurrentWidth] = useState<number | undefined>(
     undefined
   );
+  const [currentHeight, setCurrentHeight] = useState<number | undefined>(
+    undefined
+  );
   const [isBelowBreakpoint, setIsBelowBreakpoint] = useState<
     IsBelowBreakpoint | undefined
   >(undefined);
@@ -30,6 +33,7 @@ const useBreakpoints = (breakpoints?: Breakpoints) => {
     if (typeof window !== "undefined") {
       const onResize = () => {
         setCurrentWidth(window.innerWidth);
+        setCurrentHeight(window.innerHeight);
       };
 
       if (typeof currentWidth === "undefined") {
@@ -77,7 +81,7 @@ const useBreakpoints = (breakpoints?: Breakpoints) => {
     }
   }, [currentWidth]);
 
-  return { currentWidth, isBelowBreakpoint };
+  return { currentWidth, currentHeight, isBelowBreakpoint };
 };
 
 export default useBreakpoints;
