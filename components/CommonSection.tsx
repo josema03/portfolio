@@ -24,7 +24,8 @@ interface CommonSectionProps {
 
 const MotionWrapper = styled(motion.div)`
   position: fixed;
-  top: 0;
+  top: 64px;
+  bottom: auto;
   left: 0;
   z-index: 0;
 `;
@@ -129,43 +130,40 @@ const CommonSection = ({
             as="section"
             maxWidth={{ _: "425px", md: "1024px" }}
             width={{ _: "100vw", md: "75vw" }}
-            minHeight="100vh"
+            minHeight="calc(100vh - 64px)"
             mx="auto"
-            px={{ _: 4, md: 5 }}
-            py={{ _: 2, md: 4 }}
+            p={{ _: 4, md: 5 }}
             id={componentId}
             ref={getComponentHeight}
           >
-            <Box py={{ _: 5, md: 6 }}>
-              <Flex alignItems="center">
-                <Typography
-                  as="span"
-                  fontColor="textAccent"
-                  fontSize={{ _: 3, md: 3 }}
-                  fontWeight={{ _: "600", md: "700" }}
-                >
-                  {index}.&nbsp;
-                </Typography>
-                <Typography
-                  as="h2"
-                  fontColor="textPrimary"
-                  fontSize={{ _: 3, md: 3 }}
-                  fontWeight={{ _: "600", md: "700" }}
-                >
-                  {title}
-                </Typography>
-                <Flex minHeight={{ _: "100%" }} alignItems="center" flex="1">
-                  <Box
-                    minHeight={{ _: "1px", md: "2px" }}
-                    width={{ _: "100%" }}
-                    mx={{ _: 4 }}
-                    backgroundColor="#c0c0c0"
-                    content=""
-                  />
-                </Flex>
+            <Flex alignItems="center">
+              <Typography
+                as="span"
+                fontColor="textAccent"
+                fontSize={{ _: 3, md: 3 }}
+                fontWeight={{ _: "600", md: "700" }}
+              >
+                {index}.&nbsp;
+              </Typography>
+              <Typography
+                as="h2"
+                fontColor="textPrimary"
+                fontSize={{ _: 3, md: 3 }}
+                fontWeight={{ _: "600", md: "700" }}
+              >
+                {title}
+              </Typography>
+              <Flex minHeight={{ _: "100%" }} alignItems="center" flex="1">
+                <Box
+                  minHeight={{ _: "1px", md: "2px" }}
+                  width={{ _: "100%" }}
+                  mx={{ _: 4 }}
+                  backgroundColor="#c0c0c0"
+                  content=""
+                />
               </Flex>
-              {children}
-            </Box>
+            </Flex>
+            {children}
           </Box>
         </Box>
       </MotionWrapper>
