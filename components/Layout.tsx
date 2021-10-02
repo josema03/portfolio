@@ -7,8 +7,8 @@ import {
   Variants,
 } from "framer-motion";
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Flex } from "rebass/styled-components";
-import styled, { css, ThemeContext } from "styled-components";
+import { Box } from "rebass/styled-components";
+import styled, { css } from "styled-components";
 import { LayoutState } from "../pages";
 import useBreakpoints from "../utils/useBreakpoint";
 import Navbar from "./Navbar";
@@ -37,17 +37,6 @@ const SidebarWrapper = styled(motion.div)`
       width: ${sidebarWidthLg}px;
     }
   `};
-`;
-
-const NavbarWrapper = styled(motion.nav)`
-  position: fixed;
-  z-index: 10;
-  top: 0px;
-  background: transparent;
-  width: 100vw;
-  min-width: 100vw;
-  height: 64px;
-  opacity: 1;
 `;
 
 const SideContentWrapper = styled<
@@ -94,7 +83,6 @@ const Layout = ({
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
   const isServerSide = typeof window === "undefined";
-  const theme = useContext(ThemeContext);
 
   const scrollToElement = () => {
     if (elementToScrollTo !== "") {
@@ -141,18 +129,9 @@ const Layout = ({
   return (
     <>
       <Navbar />
-      <Box overflowX="hidden">
+      <Box overflowX="hidden" mt="64px">
         <motion.div style={{ translateX: sidebarTranslationX }}>
-          <Flex
-            maxWidth="100vw"
-            minHeight="calc(100vh - 64px)"
-            mt={{ _: "64px" }}
-            overflowX="hidden"
-            backgroundColor={theme.colors.background.main}
-            flexDirection="column"
-          >
-            {children}
-          </Flex>
+          {children}
         </motion.div>
       </Box>
       <SidebarWrapper style={{ translateX: sidebarTranslationX }}>
