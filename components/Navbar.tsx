@@ -10,17 +10,16 @@ import Logo from "./Logo";
 const NavbarComponent = styled(Flex)`
   background: ${({ theme }) => theme.colors.background.main};
   color: ${({ theme }) => theme.colors.background.textContrast};
-  opacity: 1;
 
   &::after {
     content: "";
     position: absolute;
-    height: 1.5px;
+    height: 0.5px;
     width: 100vw;
-    bottom: -1px;
+    bottom: 0;
     background: ${({ theme }) =>
       `linear-gradient(to right, ${theme.colors.primary.light}, ${theme.colors.primary.dark})`};
-    z-index: 10;
+    z-index: 15;
   }
 
   div {
@@ -43,68 +42,68 @@ const MotionNavbar = styled(motion.div)`
 const navbarVariants: Variants = {
   hidden: {
     y: "-100%",
-    opacity: 1,
-    transition: {
-      duration: 0.25,
-      ease: "easeIn",
-    },
+    // opacity: 1,
+    // transition: {
+    //   duration: 0.25,
+    //   ease: "easeIn",
+    // },
   },
   visible: {
     y: "0%",
-    opacity: 1,
+    // opacity: 1,
     transition: {
-      duration: 0.25,
+      duration: 0.75,
       ease: "easeIn",
     },
   },
 };
 
-const useNavbar = () => {
-  const { isMenuOpen, sidebarTranslationX } = useContext(LayoutState);
-  const { scrollY } = useViewportScroll();
-  const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+// const useNavbar = () => {
+//   const { isMenuOpen, sidebarTranslationX } = useContext(LayoutState);
+//   const { scrollY } = useViewportScroll();
+//   const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
+//   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const showNavbar = () => {
-    timeoutRef.current && clearTimeout(timeoutRef.current);
-    !isNavbarVisible && setIsNavbarVisible(true);
-  };
+//   const showNavbar = () => {
+//     timeoutRef.current && clearTimeout(timeoutRef.current);
+//     !isNavbarVisible && setIsNavbarVisible(true);
+//   };
 
-  const hideNavbar = (timeout: number) => {
-    timeoutRef.current && clearTimeout(timeoutRef.current);
-    const isHeroSection = scrollY.get() < window.innerHeight - 64 * 2;
-    if (isNavbarVisible && !isMenuOpen && !isHeroSection) {
-      timeoutRef.current = setTimeout(() => {
-        sidebarTranslationX.get() === 0 && setIsNavbarVisible(false), timeout;
-      }, timeout);
-    }
-  };
+//   const hideNavbar = (timeout: number) => {
+//     timeoutRef.current && clearTimeout(timeoutRef.current);
+//     const isHeroSection = scrollY.get() < window.innerHeight - 64 * 2;
+//     if (isNavbarVisible && !isMenuOpen && !isHeroSection) {
+//       timeoutRef.current = setTimeout(() => {
+//         sidebarTranslationX.get() === 0 && setIsNavbarVisible(false), timeout;
+//       }, timeout);
+//     }
+//   };
 
-  useEffect(() => {
-    const cancelScrollYSubscription = scrollY.onChange(() => {
-      const current = scrollY.get();
-      const prev = scrollY.getPrevious();
-      if (current < prev) {
-        showNavbar();
-        hideNavbar(2000);
-      }
-      if (current > prev) {
-        hideNavbar(0);
-      }
-    });
-    return () => cancelScrollYSubscription();
-  }, [isNavbarVisible, !isMenuOpen]);
+//   useEffect(() => {
+//     const cancelScrollYSubscription = scrollY.onChange(() => {
+//       const current = scrollY.get();
+//       const prev = scrollY.getPrevious();
+//       if (current < prev) {
+//         showNavbar();
+//         hideNavbar(2000);
+//       }
+//       if (current > prev) {
+//         hideNavbar(0);
+//       }
+//     });
+//     return () => cancelScrollYSubscription();
+//   }, [isNavbarVisible, !isMenuOpen]);
 
-  return { isNavbarVisible };
-};
+//   return { isNavbarVisible };
+// };
 
 const Navbar = () => {
   const { isMenuOpen, setIsMenuOpen } = useContext(LayoutState);
-  const { isNavbarVisible } = useNavbar();
-  const animateNavbar = useAnimationToggle(isNavbarVisible, {
-    initial: "hidden",
-    animate: "visible",
-  });
+  // const { isNavbarVisible } = useNavbar();
+  // const animateNavbar = useAnimationToggle(isNavbarVisible, {
+  //   initial: "hidden",
+  //   animate: "visible",
+  // });
 
   const scrollToTop = () => {
     document
@@ -113,11 +112,7 @@ const Navbar = () => {
   };
 
   return (
-    <MotionNavbar
-      variants={navbarVariants}
-      initial="hidden"
-      animate={animateNavbar}
-    >
+    <MotionNavbar variants={navbarVariants} initial="hidden" animate="visible">
       <NavbarComponent
         alignItems="center"
         justifyContent="space-between"
