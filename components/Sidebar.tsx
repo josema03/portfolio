@@ -1,5 +1,5 @@
 import { motion, useAnimation, Variants } from "framer-motion";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Box } from "rebass/styled-components";
 import { LayoutState } from "../pages";
 import SidebarOption from "./SidebarOption";
@@ -15,9 +15,7 @@ const optionsVariants: Variants = {
     y: "100%",
     x: "100%",
     transition: {
-      opacity: {
-        delay: 0.15,
-      },
+      duration: 0,
     },
   },
   visible: (custom) => ({
@@ -42,11 +40,17 @@ const Sidebar = ({ options, setElementToScrollTo }: SidebarProps) => {
   const { setIsMenuOpen, sidebarWidth, sidebarTranslationX } =
     useContext(LayoutState);
   const animateOptions = useAnimation();
-  sidebarTranslationX.onChange(() => {
-    const prev = sidebarTranslationX.getPrevious();
-    const curr = sidebarTranslationX.get();
-    prev === sidebarWidth && curr > prev && animateOptions.start("hidden");
-    prev === 0 && curr < prev && animateOptions.start("visible");
+
+  useEffect(() => {
+    const subscription = sidebarTranslationX.onChange(() => {
+      const curr = sidebarTranslationX.get();
+      const prev = sidebarTranslationX.getPrevious();
+      prev < 0 && curr >= 0 && animateOptions.start("hidden");
+      prev > sidebarWidth * 0.8 &&
+        curr < sidebarWidth * 0.8 &&
+        animateOptions.start("visible");
+    });
+    return () => subscription();
   });
 
   const scrollToElement = (id: string) => {

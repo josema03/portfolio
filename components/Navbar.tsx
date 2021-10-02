@@ -1,16 +1,11 @@
-import { motion, Variants } from "framer-motion";
-import React, { useContext } from "react";
+import { motion, useViewportScroll, Variants } from "framer-motion";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled from "styled-components";
 import { LayoutState } from "../pages";
 import useAnimationToggle from "../utils/useAnimationToggle";
 import HamburgerCloseButton from "./HamburgerCloseButton";
 import Logo from "./Logo";
-
-interface NavbarProps {
-  isNavbarVisible: boolean;
-  setIsNavbarVisible: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
 const NavbarComponent = styled(Flex)`
   background: ${({ theme }) => theme.colors.background.main};
@@ -34,33 +29,78 @@ const NavbarComponent = styled(Flex)`
 `;
 
 const MotionNavbar = styled(motion.div)`
+  position: fixed;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100%;
+  z-index: 10;
+  top: 0px;
+  background: transparent;
+  width: 100vw;
+  min-width: 100vw;
+  height: 64px;
 `;
 
 const navbarVariants: Variants = {
   hidden: {
-    y: "-100px",
+    y: "-100%",
     opacity: 1,
     transition: {
-      duration: 0.5,
+      duration: 0.25,
       ease: "easeIn",
     },
   },
   visible: {
-    y: "0px",
+    y: "0%",
     opacity: 1,
     transition: {
-      duration: 0.5,
+      duration: 0.25,
       ease: "easeIn",
     },
   },
 };
 
-const Navbar = ({ isNavbarVisible }: NavbarProps) => {
+const useNavbar = () => {
+  const { isMenuOpen, sidebarTranslationX } = useContext(LayoutState);
+  const { scrollY } = useViewportScroll();
+  const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const showNavbar = () => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+    !isNavbarVisible && setIsNavbarVisible(true);
+  };
+
+  const hideNavbar = (timeout: number) => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+    const isHeroSection = scrollY.get() < window.innerHeight - 64 * 2;
+    if (isNavbarVisible && !isMenuOpen && !isHeroSection) {
+      timeoutRef.current = setTimeout(() => {
+        sidebarTranslationX.get() === 0 && setIsNavbarVisible(false), timeout;
+      }, timeout);
+    }
+  };
+
+  useEffect(() => {
+    const cancelScrollYSubscription = scrollY.onChange(() => {
+      const current = scrollY.get();
+      const prev = scrollY.getPrevious();
+      if (current < prev) {
+        showNavbar();
+        hideNavbar(2000);
+      }
+      if (current > prev) {
+        hideNavbar(0);
+      }
+    });
+    return () => cancelScrollYSubscription();
+  }, [isNavbarVisible, !isMenuOpen]);
+
+  return { isNavbarVisible };
+};
+
+const Navbar = () => {
   const { isMenuOpen, setIsMenuOpen } = useContext(LayoutState);
+  const { isNavbarVisible } = useNavbar();
   const animateNavbar = useAnimationToggle(isNavbarVisible, {
     initial: "hidden",
     animate: "visible",

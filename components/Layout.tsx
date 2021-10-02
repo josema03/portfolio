@@ -6,11 +6,10 @@ import {
   useViewportScroll,
   Variants,
 } from "framer-motion";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled, { css, ThemeContext } from "styled-components";
 import { LayoutState } from "../pages";
-import useAnimationToggle from "../utils/useAnimationToggle";
 import useBreakpoints from "../utils/useBreakpoint";
 import Navbar from "./Navbar";
 import Sidebar, { SidebarProps } from "./Sidebar";
@@ -66,18 +65,6 @@ const SideContentWrapper = styled<
   z-index: 10;
 `;
 
-const navbarWrapperVariants: Variants = {
-  hidden: {
-    opacity: 0,
-  },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.05,
-    },
-  },
-};
-
 const sideContentVariants: Variants = {
   hidden: {
     y: "100%",
@@ -101,42 +88,13 @@ const Layout = ({
 }: React.PropsWithChildren<LayoutProps>) => {
   const { isMenuOpen, sidebarTranslationX, setSidebarWidth } =
     useContext(LayoutState);
-  const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
-  const [canHideNavbar, setCanHideNavbar] = useState<boolean>(false);
+
   const [canShowSideContent, setCanShowSideContent] = useState<boolean>(false);
   const [elementToScrollTo, setElementToScrollTo] = useState<string>("");
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
-  const animateNavbarWrapper = useAnimationToggle(isNavbarVisible, {
-    initial: "hidden",
-    animate: "visible",
-  });
   const isServerSide = typeof window === "undefined";
   const theme = useContext(ThemeContext);
-
-  const showNavbar = () => {
-    timeoutRef.current && clearTimeout(timeoutRef.current);
-    !isNavbarVisible && setIsNavbarVisible(true);
-  };
-
-  const hideNavbar = (timeout: number) => {
-    timeoutRef.current && clearTimeout(timeoutRef.current);
-    const isHeroSection = scrollY.get() < window.innerHeight - 64 * 2;
-    if (isNavbarVisible && canHideNavbar && !isHeroSection) {
-      timeoutRef.current = setTimeout(() => setIsNavbarVisible(false), timeout);
-    }
-  };
-
-  const showSideContent = () => {
-    const current = scrollY.get();
-    if (current > (window.innerHeight * 3) / 5) {
-      setCanShowSideContent(true);
-    }
-    if (current < (window.innerHeight * 3) / 5) {
-      setCanShowSideContent(false);
-    }
-  };
 
   const scrollToElement = () => {
     if (elementToScrollTo !== "") {
@@ -151,11 +109,9 @@ const Layout = ({
     const animateLayout = async () => {
       if (isMenuOpen && isBelowBreakpoint) {
         const { md: isBelowMd } = isBelowBreakpoint;
-        setCanHideNavbar(false);
         setSidebarWidth(isBelowMd ? -sidebarWidthSm : -sidebarWidthLg);
         sidebarTranslationX.set(isBelowMd ? -sidebarWidthSm : -sidebarWidthLg);
       } else {
-        setCanHideNavbar(true);
         sidebarTranslationX.set(0);
         scrollToElement();
       }
@@ -172,38 +128,19 @@ const Layout = ({
   useEffect(() => {
     const cancelScrollYSubscription = scrollY.onChange(() => {
       const current = scrollY.get();
-      const prev = scrollY.getPrevious();
-      if (current < prev) {
-        showNavbar();
-        hideNavbar(2000);
+      if (current > (window.innerHeight * 3) / 5) {
+        setCanShowSideContent(true);
       }
-      if (current > prev) {
-        hideNavbar(0);
+      if (current < (window.innerHeight * 3) / 5) {
+        setCanShowSideContent(false);
       }
-      showSideContent();
     });
     return () => cancelScrollYSubscription();
-  }, [isNavbarVisible, canHideNavbar]);
-
-  useEffect(() => {
-    showSideContent();
   }, []);
 
   return (
     <>
-      <NavbarWrapper
-        variants={navbarWrapperVariants}
-        initial="hidden"
-        animate={animateNavbarWrapper}
-        onMouseEnter={showNavbar}
-        onClick={showNavbar}
-        onMouseLeave={() => hideNavbar(1000)}
-      >
-        <Navbar
-          isNavbarVisible={isNavbarVisible}
-          setIsNavbarVisible={setIsNavbarVisible}
-        />
-      </NavbarWrapper>
+      <Navbar />
       <Box overflowX="hidden">
         <motion.div style={{ translateX: sidebarTranslationX }}>
           <Flex
