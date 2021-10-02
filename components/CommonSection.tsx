@@ -1,4 +1,10 @@
-import { motion, useTransform, useViewportScroll } from "framer-motion";
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useTransform,
+  useViewportScroll,
+} from "framer-motion";
 import React, {
   useCallback,
   useContext,
@@ -34,6 +40,7 @@ const CommonSection = ({
     output: {
       opacity: [0, 0],
       scale: [1, 1],
+      progress: [0, 1],
     },
   });
   const { scrollY } = useViewportScroll();
@@ -47,6 +54,12 @@ const CommonSection = ({
     motionRange.input,
     motionRange.output.scale
   );
+  const componentScrollProgress = useTransform(
+    scrollY,
+    motionRange.input,
+    motionRange.output.progress
+  );
+  const componentTransformOrigin = useMotionValue("bottom center");
   const [componentHeight, setComponentHeight] = useState(0);
   const componentId = useRef(title.toLowerCase().split(" ").join("-")).current;
   const placeholderId = useRef(
@@ -55,7 +68,7 @@ const CommonSection = ({
 
   const getComponentHeight = useCallback((node) => {
     const { scrollHeight } = node;
-    setComponentHeight(scrollHeight);
+    setComponentHeight(scrollHeight * 2);
   }, []);
 
   const setMotionTransformValues = useCallback((node: HTMLElement) => {
@@ -65,26 +78,41 @@ const CommonSection = ({
     setMotionRange({
       input: [
         0,
-        offsetTop - innerHeight * 0.15,
+        offsetTop - innerHeight * 0.75,
         offsetTop,
-        offsetTop + scrollHeight - innerHeight * 0.7,
-        offsetTop + scrollHeight - innerHeight * 0.15,
+        offsetTop + scrollHeight - innerHeight * 0.75,
+        offsetTop + scrollHeight,
       ],
-      output: { opacity: [0, 1, 1, 1, 0], scale: [0, 0, 1, 1, 0] },
+      output: {
+        opacity: [1, 1, 1, 1, 0],
+        scale: [0, 0, 1, 1, 0],
+        progress: [0, 0, 0, 1, 1],
+      },
     });
   }, []);
 
   useEffect(() => {
     const placeholderElement = document.getElementById(placeholderId);
+
     const observer = new MutationObserver((_, observer) => {
-      placeholderElement && setMotionTransformValues(placeholderElement);
+      !!placeholderElement && setMotionTransformValues(placeholderElement);
     });
-    observer.observe(placeholderElement!, {
-      childList: false,
-      characterData: false,
-      attributes: true,
+
+    !!placeholderElement &&
+      observer.observe(placeholderElement, {
+        childList: false,
+        characterData: false,
+        attributes: true,
+      });
+  }, []);
+
+  useEffect(() => {
+    const cancelSubscription = componentScrollProgress.onChange((value) => {
+      value < 0.5 && componentTransformOrigin.set("bottom center");
+      value > 0.5 && componentTransformOrigin.set("top center");
     });
-  });
+    return () => cancelSubscription();
+  }, [componentScrollProgress]);
 
   return (
     <>
@@ -93,6 +121,7 @@ const CommonSection = ({
           opacity: opacityMotionValue,
           scale: scaleMotionValue,
           translateX: sidebarTranslationX,
+          transformOrigin: componentTransformOrigin,
         }}
       >
         <Box minWidth="100vw">
