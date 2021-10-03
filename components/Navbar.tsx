@@ -1,9 +1,8 @@
-import { motion, useViewportScroll, Variants } from "framer-motion";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { motion, Variants } from "framer-motion";
+import React, { useContext } from "react";
 import { Box, Flex } from "rebass/styled-components";
 import styled from "styled-components";
 import { LayoutState } from "../pages";
-import useAnimationToggle from "../utils/useAnimationToggle";
 import HamburgerCloseButton from "./HamburgerCloseButton";
 import Logo from "./Logo";
 
@@ -98,7 +97,8 @@ const navbarVariants: Variants = {
 // };
 
 const Navbar = () => {
-  const { isMenuOpen, setIsMenuOpen } = useContext(LayoutState);
+  const { isMenuOpen, setIsMenuOpen, setElementToScrollTo } =
+    useContext(LayoutState);
   // const { isNavbarVisible } = useNavbar();
   // const animateNavbar = useAnimationToggle(isNavbarVisible, {
   //   initial: "hidden",
@@ -106,9 +106,8 @@ const Navbar = () => {
   // });
 
   const scrollToTop = () => {
-    document
-      .getElementsByTagName("body")[0]
-      ?.scrollIntoView({ behavior: "smooth" });
+    setElementToScrollTo("home");
+    setIsMenuOpen(false);
   };
 
   return (

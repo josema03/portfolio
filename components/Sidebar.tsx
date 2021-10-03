@@ -6,7 +6,6 @@ import SidebarOption from "./SidebarOption";
 
 export interface SidebarProps {
   options: { label: string }[];
-  setElementToScrollTo: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const optionsVariants: Variants = {
@@ -36,9 +35,13 @@ const optionsVariants: Variants = {
   }),
 };
 
-const Sidebar = ({ options, setElementToScrollTo }: SidebarProps) => {
-  const { setIsMenuOpen, sidebarWidth, sidebarTranslationX } =
-    useContext(LayoutState);
+const Sidebar = ({ options }: SidebarProps) => {
+  const {
+    setIsMenuOpen,
+    setElementToScrollTo,
+    sidebarWidth,
+    sidebarTranslationX,
+  } = useContext(LayoutState);
   const animateOptions = useAnimation();
 
   useEffect(() => {

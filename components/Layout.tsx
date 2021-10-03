@@ -75,20 +75,28 @@ const Layout = ({
   social,
   email,
 }: React.PropsWithChildren<LayoutProps>) => {
-  const { isMenuOpen, sidebarTranslationX, setSidebarWidth } =
-    useContext(LayoutState);
+  const {
+    isMenuOpen,
+    sidebarTranslationX,
+    setSidebarWidth,
+    elementToScrollTo,
+    setElementToScrollTo,
+  } = useContext(LayoutState);
 
   const [canShowSideContent, setCanShowSideContent] = useState<boolean>(false);
-  const [elementToScrollTo, setElementToScrollTo] = useState<string>("");
+  const [] = useState<string>("");
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
   const isServerSide = typeof window === "undefined";
 
   const scrollToElement = () => {
     if (elementToScrollTo !== "") {
-      document
-        .getElementById(elementToScrollTo)
-        ?.scrollIntoView({ behavior: "smooth" });
+      const node =
+        elementToScrollTo === "home"
+          ? document.getElementsByTagName("body")[0]
+          : document.getElementById(elementToScrollTo);
+
+      node?.scrollIntoView({ behavior: "smooth" });
       setElementToScrollTo("");
     }
   };
@@ -101,8 +109,8 @@ const Layout = ({
         sidebarTranslationX.set(isBelowMd ? -sidebarWidthSm : -sidebarWidthLg);
       } else {
         sidebarTranslationX.set(0);
-        scrollToElement();
       }
+      scrollToElement();
     };
     if (!isServerSide) {
       window.addEventListener("resize", animateLayout);
@@ -111,7 +119,7 @@ const Layout = ({
     return () => {
       !isServerSide && window.removeEventListener("resize", animateLayout);
     };
-  }, [isMenuOpen, isServerSide, isBelowBreakpoint]);
+  }, [isMenuOpen, isServerSide, isBelowBreakpoint, elementToScrollTo]);
 
   useEffect(() => {
     const cancelScrollYSubscription = scrollY.onChange(() => {
@@ -129,16 +137,13 @@ const Layout = ({
   return (
     <>
       <Navbar />
-      <Box overflowX="hidden" mt="64px">
+      <Box overflowX="hidden">
         <motion.div style={{ translateX: sidebarTranslationX }}>
           {children}
         </motion.div>
       </Box>
       <SidebarWrapper style={{ translateX: sidebarTranslationX }}>
-        <Sidebar
-          options={options}
-          setElementToScrollTo={setElementToScrollTo}
-        />
+        <Sidebar options={options} />
       </SidebarWrapper>
       <AnimatePresence>
         {!isBelowBreakpoint?.md && !isMenuOpen && canShowSideContent && (
