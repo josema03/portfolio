@@ -1,28 +1,53 @@
 import { MotionValue, useSpring } from "framer-motion";
-import { createContext, Dispatch, SetStateAction, useState } from "react";
-import CommonSection from "../components/CommonSection";
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import CommonSection, {
+  CommonSectionContext,
+} from "../components/CommonSection";
 import HeroSection from "../components/HeroSection";
 import Layout from "../components/Layout";
 
-interface LayoutStateInterface {
+interface LayoutStateContext {
   isMenuOpen: boolean;
   setIsMenuOpen: Dispatch<SetStateAction<boolean>>;
   sidebarWidth: number;
   setSidebarWidth: Dispatch<SetStateAction<number>>;
+  elementToScrollTo: string;
+  setElementToScrollTo: React.Dispatch<React.SetStateAction<string>>;
   sidebarTranslationX: MotionValue<number>;
 }
 
-export const LayoutState = createContext<LayoutStateInterface>({
+export const LayoutState = createContext<LayoutStateContext>({
   isMenuOpen: false,
   setIsMenuOpen: () => {},
   sidebarWidth: 0,
   setSidebarWidth: () => {},
+  elementToScrollTo: "",
+  setElementToScrollTo: () => {},
   sidebarTranslationX: new MotionValue(0),
 });
+
+const Example = () => {
+  const { parentId, progress } = useContext(CommonSectionContext);
+
+  useEffect(() => {
+    const subs = progress.onChange((value) => console.log(parentId, value));
+    return subs;
+  });
+
+  return <div>QLQ</div>;
+};
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [sidebarWidth, setSidebarWidth] = useState<number>(0);
+  const [elementToScrollTo, setElementToScrollTo] = useState<string>("");
   const sidebarTranslationX = useSpring(0, {
     stiffness: 150,
     damping: 5,
@@ -33,6 +58,8 @@ export default function Home() {
     setIsMenuOpen,
     sidebarWidth,
     setSidebarWidth,
+    elementToScrollTo,
+    setElementToScrollTo,
     sidebarTranslationX,
   };
 
@@ -44,9 +71,9 @@ export default function Home() {
   };
 
   const pageContent = [
-    { title: "About", component: <div></div> },
-    { title: "Experience", component: <div></div> },
-    { title: "Projects", component: <div></div> },
+    { title: "About", component: <Example /> },
+    { title: "Experience", component: <Example /> },
+    { title: "Projects", component: <Example /> },
   ];
 
   const sidebarOptions = pageContent.map((section) => ({

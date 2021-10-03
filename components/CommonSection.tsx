@@ -1,5 +1,11 @@
-import { motion, useTransform, useViewportScroll } from "framer-motion";
+import {
+  motion,
+  MotionValue,
+  useTransform,
+  useViewportScroll,
+} from "framer-motion";
 import React, {
+  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -12,10 +18,26 @@ import { LayoutState } from "../pages";
 import useBreakpoints from "../utils/useBreakpoint";
 import Typography from "./Typography";
 
+interface CommonSectionContext {
+  progress: MotionValue;
+  parentId: string;
+}
+
+export const CommonSectionContext = createContext<CommonSectionContext>({
+  progress: new MotionValue(0),
+  parentId: "",
+});
+
 interface CommonSectionProps {
   index: number;
   title: string;
 }
+
+const ContentCard = styled(Box)`
+  position: relative;
+  border: solid white 2px;
+  border-radius: 2.5%;
+`;
 
 const MotionWrapper = styled(motion.div)`
   position: fixed;
@@ -112,8 +134,9 @@ const CommonSection = ({
         }}
       >
         <Box minWidth="100vw">
-          <Box
+          <Flex
             as="section"
+            flexDirection="column"
             maxWidth={{ _: "425px", md: "1024px" }}
             width={{ _: "100vw", md: "75vw" }}
             minHeight="calc(100vh - 64px)"
@@ -149,11 +172,17 @@ const CommonSection = ({
                 />
               </Flex>
             </Flex>
-            {React.Children.map(children, (child) => {
-              React.isValidElement(child) &&
-                React.cloneElement(child, { componentScrollProgress });
-            })}
-          </Box>
+            <CommonSectionContext.Provider
+              value={{
+                progress: componentScrollProgress,
+                parentId: componentId,
+              }}
+            >
+              <ContentCard flex="1" my={{ _: 4, md: 4 }}>
+                {children}
+              </ContentCard>
+            </CommonSectionContext.Provider>
+          </Flex>
         </Box>
       </MotionWrapper>
       <Box height={componentHeight} id={placeholderId}></Box>
