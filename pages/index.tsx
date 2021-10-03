@@ -1,4 +1,4 @@
-import { MotionValue, useSpring } from "framer-motion";
+import { MotionValue, useSpring, useTransform } from "framer-motion";
 import React, {
   createContext,
   Dispatch,
@@ -21,6 +21,7 @@ interface LayoutStateContext {
   elementToScrollTo: string;
   setElementToScrollTo: React.Dispatch<React.SetStateAction<string>>;
   sidebarTranslationX: MotionValue<number>;
+  contentTranslationX: MotionValue<number>;
 }
 
 export const LayoutState = createContext<LayoutStateContext>({
@@ -31,6 +32,7 @@ export const LayoutState = createContext<LayoutStateContext>({
   elementToScrollTo: "",
   setElementToScrollTo: () => {},
   sidebarTranslationX: new MotionValue(0),
+  contentTranslationX: new MotionValue(0),
 });
 
 const Example = () => {
@@ -53,6 +55,10 @@ export default function Home() {
     damping: 5,
     mass: 0.15,
   });
+  const contentTranslationX = useTransform(
+    sidebarTranslationX,
+    (sidebarTranslationX: number) => sidebarTranslationX * 1.1
+  );
   const layoutState = {
     isMenuOpen,
     setIsMenuOpen,
@@ -61,6 +67,7 @@ export default function Home() {
     elementToScrollTo,
     setElementToScrollTo,
     sidebarTranslationX,
+    contentTranslationX,
   };
 
   const heroSection = {

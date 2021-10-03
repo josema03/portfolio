@@ -78,13 +78,13 @@ const Layout = ({
   const {
     isMenuOpen,
     sidebarTranslationX,
+    contentTranslationX,
     setSidebarWidth,
     elementToScrollTo,
     setElementToScrollTo,
   } = useContext(LayoutState);
 
   const [canShowSideContent, setCanShowSideContent] = useState<boolean>(false);
-  const [] = useState<string>("");
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
   const isServerSide = typeof window === "undefined";
@@ -138,7 +138,7 @@ const Layout = ({
     <>
       <Navbar />
       <Box overflowX="hidden">
-        <motion.div style={{ translateX: sidebarTranslationX }}>
+        <motion.div style={{ translateX: contentTranslationX }}>
           {children}
         </motion.div>
       </Box>
@@ -146,26 +146,28 @@ const Layout = ({
         <Sidebar options={options} />
       </SidebarWrapper>
       <AnimatePresence>
-        {!isBelowBreakpoint?.md && !isMenuOpen && canShowSideContent && (
+        {!isBelowBreakpoint?.md && canShowSideContent && (
           <SideContentWrapper
             side="left"
             variants={sideContentVariants}
             initial="hidden"
             animate="visible"
             exit="hidden"
+            style={{ translateX: contentTranslationX }}
           >
             <SideSocial {...social} />
           </SideContentWrapper>
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {!isBelowBreakpoint?.md && !isMenuOpen && canShowSideContent && (
+        {!isBelowBreakpoint?.md && canShowSideContent && (
           <SideContentWrapper
             side="right"
             variants={sideContentVariants}
             initial="hidden"
             animate="visible"
             exit="hidden"
+            style={{ translateX: contentTranslationX }}
           >
             <SideEmail {...email} />
           </SideContentWrapper>

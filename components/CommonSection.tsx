@@ -53,8 +53,8 @@ const CommonSection = ({
   title,
   children,
 }: React.PropsWithChildren<CommonSectionProps>) => {
-  const { sidebarTranslationX } = useContext(LayoutState);
-  const { currentWidth, currentHeight } = useBreakpoints();
+  const { contentTranslationX } = useContext(LayoutState);
+  const { currentWidth, currentHeight, previousHeight } = useBreakpoints();
   const [motionRange, setMotionRange] = useState({
     input: [0, 1],
     output: {
@@ -106,8 +106,8 @@ const CommonSection = ({
         0,
         offsetTop - innerHeight - 64,
         offsetTop - 64,
-        offsetTop + scrollHeight - innerHeight,
-        offsetTop + scrollHeight,
+        offsetTop + scrollHeight - innerHeight - 64 * 1.5 * 2,
+        offsetTop + scrollHeight - 64 * 1.5,
       ],
       output: {
         opacity: [1, 1, 1, 1, 0],
@@ -119,6 +119,13 @@ const CommonSection = ({
   }, []);
 
   useEffect(() => {
+    const heightChange =
+      !!previousHeight &&
+      !!currentHeight &&
+      Math.abs(1 - previousHeight / currentHeight);
+    console.log(heightChange);
+    if (!!heightChange && heightChange < 0.1) return;
+
     const placeholderElement = document.getElementById(placeholderId);
     !!placeholderElement && setMotionTransformValues(placeholderElement);
   }, [currentHeight, currentWidth]);
@@ -129,7 +136,7 @@ const CommonSection = ({
         style={{
           opacity: opacityMotionValue,
           scale: scaleMotionValue,
-          translateX: sidebarTranslationX,
+          translateX: contentTranslationX,
           translateY: translateYMotionValue,
         }}
       >
