@@ -1,11 +1,4 @@
-import {
-  AnimatePresence,
-  ForwardRefComponent,
-  HTMLMotionProps,
-  motion,
-  useViewportScroll,
-  Variants,
-} from "framer-motion";
+import { motion, useViewportScroll } from "framer-motion";
 import React, { useContext, useEffect, useState } from "react";
 import { Box } from "rebass/styled-components";
 import styled, { css } from "styled-components";
@@ -13,6 +6,7 @@ import { LayoutState } from "../pages";
 import useBreakpoints from "../utils/useBreakpoint";
 import Navbar from "./Navbar";
 import Sidebar, { SidebarProps } from "./Sidebar";
+import SideContentWrapper from "./SideContentWrapper";
 import SideEmail from "./SideEmail";
 import SideSocial from "./SideSocial";
 
@@ -39,36 +33,6 @@ const SidebarWrapper = styled(motion.div)`
   `};
 `;
 
-const SideContentWrapper = styled<
-  ForwardRefComponent<
-    HTMLDivElement,
-    HTMLMotionProps<"div"> & { side: "left" | "right" }
-  >
->(motion.div)`
-  position: fixed;
-  top: auto;
-  right: ${({ side }) => (side === "right" ? "5vw" : "auto")};
-  bottom: 0px;
-  left: ${({ side }) => (side === "left" ? "5vw" : "auto")};
-  background-color: transparent;
-  z-index: 10;
-`;
-
-const sideContentVariants: Variants = {
-  hidden: {
-    y: "100%",
-    transition: {
-      duration: 0.05,
-    },
-  },
-  visible: {
-    y: "0px",
-    transition: {
-      duration: 0.3,
-    },
-  },
-};
-
 const Layout = ({
   children,
   options,
@@ -84,7 +48,6 @@ const Layout = ({
     setElementToScrollTo,
   } = useContext(LayoutState);
 
-  const [canShowSideContent, setCanShowSideContent] = useState<boolean>(false);
   const { isBelowBreakpoint } = useBreakpoints();
   const { scrollY } = useViewportScroll();
   const isServerSide = typeof window === "undefined";
@@ -121,19 +84,6 @@ const Layout = ({
     };
   }, [isMenuOpen, isServerSide, isBelowBreakpoint, elementToScrollTo]);
 
-  useEffect(() => {
-    const cancelScrollYSubscription = scrollY.onChange(() => {
-      const current = scrollY.get();
-      if (current > (window.innerHeight * 3) / 5) {
-        setCanShowSideContent(true);
-      }
-      if (current < (window.innerHeight * 3) / 5) {
-        setCanShowSideContent(false);
-      }
-    });
-    return () => cancelScrollYSubscription();
-  }, []);
-
   return (
     <>
       <Navbar />
@@ -145,34 +95,12 @@ const Layout = ({
       <SidebarWrapper style={{ translateX: sidebarTranslationX }}>
         <Sidebar options={options} />
       </SidebarWrapper>
-      <AnimatePresence>
-        {!isBelowBreakpoint?.md && canShowSideContent && (
-          <SideContentWrapper
-            side="left"
-            variants={sideContentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            style={{ translateX: contentTranslationX }}
-          >
-            <SideSocial {...social} />
-          </SideContentWrapper>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {!isBelowBreakpoint?.md && canShowSideContent && (
-          <SideContentWrapper
-            side="right"
-            variants={sideContentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            style={{ translateX: contentTranslationX }}
-          >
-            <SideEmail {...email} />
-          </SideContentWrapper>
-        )}
-      </AnimatePresence>
+      <SideContentWrapper side="left">
+        <SideSocial {...social} />
+      </SideContentWrapper>
+      <SideContentWrapper side="right">
+        <SideEmail {...email} />
+      </SideContentWrapper>
     </>
   );
 };

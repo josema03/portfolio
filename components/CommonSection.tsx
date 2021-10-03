@@ -123,7 +123,6 @@ const CommonSection = ({
       !!previousHeight &&
       !!currentHeight &&
       Math.abs(1 - previousHeight / currentHeight);
-    console.log(heightChange);
     if (!!heightChange && heightChange < 0.1) return;
 
     const placeholderElement = document.getElementById(placeholderId);
