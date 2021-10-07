@@ -40,8 +40,26 @@ declare module "styled-components" {
 
 const commonProperties: CommonProperties = {
   fontFamily: { heading: "Inter", body: "Inter" },
-  fontSizes: ["0.25rem", "0.5rem", "1rem", "2rem", "4rem", "6rem", "8rem"],
-  lineHeights: ["0.25rem", "0.5rem", "1rem", "2rem", "4rem", "6rem", "8rem"],
+  fontSizes: [
+    "0.25rem",
+    "0.5rem",
+    "1rem",
+    "1.5rem",
+    "2.25rem",
+    "3rem",
+    "4rem",
+    "5rem",
+  ],
+  lineHeights: [
+    "0.3125rem",
+    "0.625rem",
+    "1.25rem",
+    "1.875rem",
+    "2.8125rem",
+    "3.75rem",
+    "5rem",
+    "6.25rem",
+  ],
   breakpoints: ["0px", "320px", "425px", "768px", "1024px", "1200px"],
   space: ["0rem", "0.1rem", "0.2rem", "0.4rem", "0.8rem", "1.6rem", "3.2rem"],
 };
@@ -61,15 +79,15 @@ export const darkTheme: DefaultTheme = {
       dark: "#20115b",
       textContrast: "#ffffff",
     },
-    background: {
-      main: "#010108",
-      textContrast: "#ffffff",
-    },
     accent: {
       main: "#bc7201",
       light: "#e5ab09",
       dark: "#6a2202",
       textContrast: "#010108",
+    },
+    background: {
+      main: "#010108",
+      textContrast: "#ffffff",
     },
     textPrimary: {
       main: "#ffffff",

@@ -21,7 +21,7 @@ const Typography: React.FunctionComponent<CustomTypographyProps & MotionProps> =
         color={
           typeof fontColor !== "undefined"
             ? theme.colors[fontColor]!.main
-            : "inherit"
+            : theme.colors.textPrimary!.main
         }
       >
         {props.children}

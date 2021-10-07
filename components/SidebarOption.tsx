@@ -40,7 +40,7 @@ const SidebarOption: React.FunctionComponent<SideOptionProps> = ({
         fontColor="textAccent"
         fontWeight="700"
         width={{ _: "2rem", md: "3rem" }}
-        fontSize={{ _: "2rem", md: "3rem" }}
+        fontSize={{ _: 4, md: 5 }}
         variants={typographyVariants}
         animate={animation}
         onMouseEnter={() => animation.start("onHover")}
@@ -55,7 +55,7 @@ const SidebarOption: React.FunctionComponent<SideOptionProps> = ({
         renderAs={motion.div}
         fontColor="textPrimary"
         fontWeight="700"
-        fontSize={{ _: "2rem", md: "3rem" }}
+        fontSize={{ _: 4, md: 5 }}
         variants={typographyVariants}
         animate={animation}
         onMouseEnter={() => animation.start("onHover")}

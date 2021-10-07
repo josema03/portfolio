@@ -114,7 +114,7 @@ const HeroSection = ({
               <Typography
                 fontColor="textAccent"
                 fontWeight={{ _: "600" }}
-                fontSize={{ _: 2, xl: 3 }}
+                fontSize={{ _: 3, xl: 4 }}
                 my={{ _: 1, xl: 2 }}
               >
                 {intro}
@@ -129,8 +129,8 @@ const HeroSection = ({
               <Typography
                 fontColor="textPrimary"
                 fontWeight={{ _: "900" }}
-                fontSize={{ _: 4, xl: 5 }}
-                lineHeight={{ _: 4, xl: 5 }}
+                fontSize={{ _: 5, xl: 7 }}
+                lineHeight={{ _: 5, xl: 7 }}
                 my={{ _: 1, xl: 2 }}
               >
                 {name}
@@ -145,7 +145,7 @@ const HeroSection = ({
               <Typography
                 fontColor="textSecondary"
                 fontWeight={{ _: "600" }}
-                fontSize={{ _: 2, xl: 3 }}
+                fontSize={{ _: 3, xl: 4 }}
                 my={{ _: 1, xl: 2 }}
               >
                 {description}
