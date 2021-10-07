@@ -1,4 +1,5 @@
 import { motion, Variants } from "framer-motion";
+import { transparentize } from "polished";
 import React from "react";
 import { Box, Flex, Image } from "rebass/styled-components";
 import styled from "styled-components";
@@ -40,11 +41,10 @@ const Faint = styled.div`
   height: 100%;
   width: 100%;
   background: radial-gradient(
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0.95),
-    rgba(0, 0, 0, 1)
+    ${({ theme }) => transparentize(1, theme.colors.background.main)},
+    ${({ theme }) => transparentize(0.9, theme.colors.background.main)},
+    ${({ theme }) => transparentize(0.3, theme.colors.background.main)},
+    ${({ theme }) => transparentize(0, theme.colors.background.main)}
   );
 `;
 
@@ -57,10 +57,10 @@ const AstronautFaint = styled.div`
   width: 100%;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0.3),
-    rgba(0, 0, 0, 1)
+    ${({ theme }) => transparentize(1, theme.colors.background.main)},
+    ${({ theme }) => transparentize(0.9, theme.colors.background.main)},
+    ${({ theme }) => transparentize(0.3, theme.colors.background.main)},
+    ${({ theme }) => transparentize(0, theme.colors.background.main)}
   );
 `;
 

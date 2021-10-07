@@ -4,7 +4,7 @@ import { darkTheme } from "../theme/theme";
 
 const BlackBody = createGlobalStyle`
   body {
-    background-color: black;
+    background-color: ${({ theme }) => theme.colors.background.main};
   }
 `;
 
