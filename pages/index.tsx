@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import About from "../components/About";
 import CommonSection, {
   CommonSectionContext,
 } from "../components/CommonSection";
@@ -78,7 +79,7 @@ export default function Home() {
   };
 
   const pageContent = [
-    { title: "About", component: <Example /> },
+    { title: "About", component: <About /> },
     { title: "Experience", component: <Example /> },
     { title: "Projects", component: <Example /> },
   ];
