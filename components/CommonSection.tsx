@@ -4,6 +4,7 @@ import {
   useTransform,
   useViewportScroll,
 } from "framer-motion";
+import { transparentize } from "polished";
 import React, {
   createContext,
   useCallback,
@@ -33,12 +34,6 @@ interface CommonSectionProps {
   title: string;
 }
 
-const ContentCard = styled(Box)`
-  position: relative;
-  border: solid white 2px;
-  border-radius: 2.5%;
-`;
-
 const MotionWrapper = styled(motion.div)`
   position: fixed;
   top: 64px;
@@ -46,6 +41,10 @@ const MotionWrapper = styled(motion.div)`
   left: 0;
   z-index: 0;
   transform-origin: top center;
+`;
+
+const RelativeBox = styled(Box)`
+  position: relative;
 `;
 
 const CommonSection = ({
@@ -94,7 +93,7 @@ const CommonSection = ({
   const getComponentHeight = useCallback((node) => {
     if (!node) return;
     const { scrollHeight } = node;
-    setComponentHeight(scrollHeight * 2);
+    setComponentHeight(scrollHeight * 4);
   }, []);
 
   const setMotionTransformValues = useCallback((node: HTMLElement) => {
@@ -105,7 +104,7 @@ const CommonSection = ({
       input: [
         0,
         offsetTop - innerHeight - 64,
-        offsetTop - 64,
+        offsetTop,
         offsetTop + scrollHeight - innerHeight - 64 * 1.5 * 2,
         offsetTop + scrollHeight - 64 * 1.5,
       ],
@@ -145,7 +144,8 @@ const CommonSection = ({
             flexDirection="column"
             maxWidth={{ _: "425px", md: "1024px" }}
             width={{ _: "100vw", md: "75vw" }}
-            minHeight="calc(100vh - 64px)"
+            height="calc(100vh - 64px)"
+            maxHeight="calc(100vh - 64px)"
             mx="auto"
             p={{ _: 4, md: 5 }}
             id={componentId}
@@ -184,9 +184,14 @@ const CommonSection = ({
                 parentId: componentId,
               }}
             >
-              <ContentCard flex="1" my={{ _: 4, md: 4 }}>
+              <RelativeBox
+                flex="1"
+                my={{ _: 5, md: 5 }}
+                maxHeight="100%"
+                overflow="hidden"
+              >
                 {children}
-              </ContentCard>
+              </RelativeBox>
             </CommonSectionContext.Provider>
           </Flex>
         </Box>
