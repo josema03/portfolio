@@ -50,7 +50,7 @@ const useBreakpoints = (breakpoints?: Breakpoints) => {
         window.removeEventListener("resize", onResize);
       };
     }
-  });
+  }, []);
 
   useEffect(() => {
     if (!!currentWidth) {
