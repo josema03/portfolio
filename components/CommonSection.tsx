@@ -19,10 +19,27 @@ import { LayoutState } from "../pages";
 import useBreakpoints from "../utils/useBreakpoint";
 import Typography from "./Typography";
 
+interface BreakpointsMapping {
+  _: number;
+  xs: number;
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+}
 interface CommonSectionContext {
   progress: MotionValue;
   parentId: string;
 }
+
+const breakpointsMapping: BreakpointsMapping = {
+  _: 0,
+  xs: 1,
+  sm: 2,
+  md: 3,
+  lg: 4,
+  xl: 5,
+};
 
 export const CommonSectionContext = createContext<CommonSectionContext>({
   progress: new MotionValue(0),
@@ -43,7 +60,70 @@ const MotionWrapper = styled(motion.div)`
   transform-origin: top center;
 `;
 
-const RelativeBox = styled(Box)`
+const ContentWrapper = styled(Flex)`
+  position: relative;
+
+  ::before,
+  ::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+  }
+
+  ::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    background: ${({ theme }) => `linear-gradient(
+      to top,
+      ${transparentize(1, theme.colors.background.main)},
+      ${transparentize(0, theme.colors.background.main)},
+      ${transparentize(0, theme.colors.background.main)}
+    )`};
+  }
+
+  ::after {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: ${({ theme }) => `linear-gradient(
+      to bottom,
+      ${transparentize(1, theme.colors.background.main)},
+      ${transparentize(0, theme.colors.background.main)},
+      ${transparentize(0, theme.colors.background.main)}
+    )`};
+  }
+
+  ${({ theme, py }) =>
+    Object.entries(py as Object)
+      .map(([breakpoint, spacingIndex]) => {
+        const breakpointIndex =
+          breakpointsMapping[breakpoint as keyof BreakpointsMapping];
+        const breakpointValue = theme.breakpoints[breakpointIndex];
+        const spacingValue = theme.space[spacingIndex];
+        return `
+          @media (min-width: ${breakpointValue}) {
+            ::before, ::after {
+              height: calc( ${spacingValue} * 2 )
+            }
+
+            ::before {
+              top: calc( -0.75 * ${spacingValue} )
+            }
+
+            ::after {
+              bottom: calc( -0.75 * ${spacingValue} )
+            }
+          }
+        `;
+      })
+      .join(";")}
+`;
+
+const RelativeFlex = styled(Flex)`
   position: relative;
 `;
 
@@ -184,14 +264,16 @@ const CommonSection = ({
                 parentId: componentId,
               }}
             >
-              <RelativeBox
-                flex="1"
-                my={{ _: 5, md: 5 }}
-                maxHeight="100%"
-                overflow="hidden"
-              >
-                {children}
-              </RelativeBox>
+              <ContentWrapper flex="1" overflow="hidden" py={{ _: 5 }}>
+                <RelativeFlex
+                  flex="1"
+                  flexDirection="column"
+                  maxHeight="100%"
+                  overflow="visible"
+                >
+                  {children}
+                </RelativeFlex>
+              </ContentWrapper>
             </CommonSectionContext.Provider>
           </Flex>
         </Box>
