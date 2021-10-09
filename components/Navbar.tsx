@@ -118,7 +118,7 @@ const Navbar = () => {
         width="100%"
         height="100%"
       >
-        <Box mx={{ _: 4, md: 6 }} id="logo-and-title" onClick={scrollToTop}>
+        <Box mx={{ _: 4, md: 5 }} id="logo-and-title" onClick={scrollToTop}>
           <Logo />
         </Box>
         <Box
