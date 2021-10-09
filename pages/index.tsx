@@ -39,11 +39,6 @@ export const LayoutState = createContext<LayoutStateContext>({
 const Example = () => {
   const { parentId, progress } = useContext(CommonSectionContext);
 
-  useEffect(() => {
-    const subs = progress.onChange((value) => console.log(parentId, value));
-    return subs;
-  });
-
   return <div>QLQ</div>;
 };
 
