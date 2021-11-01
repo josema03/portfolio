@@ -1,5 +1,6 @@
 import { motion, useAnimation, Variants } from "framer-motion";
 import React, { useContext, useEffect } from "react";
+import { BoxProps } from "rebass";
 import { Box } from "rebass/styled-components";
 import styled from "styled-components";
 import { LayoutState } from "../pages";
@@ -9,7 +10,7 @@ export interface SidebarProps {
   options: { label: string }[];
 }
 
-const ULBox = styled(Box)`
+const ULBox = styled(Box)<BoxProps>`
   list-style: none;
 `;
 
@@ -70,11 +71,7 @@ const Sidebar = ({ options }: SidebarProps) => {
     <Box mt={{ _: 4, md: 5 }}>
       <ULBox as="ul" pl={{ _: 0 }}>
         {options.map((option, index) => {
-          const id = option.label
-            .toLowerCase()
-            .split(" ")
-            .concat("placeholder")
-            .join("-");
+          const id = option.label.toLowerCase();
           return (
             <motion.li
               custom={{ index }}

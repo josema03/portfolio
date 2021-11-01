@@ -1,7 +1,14 @@
 import type { AppProps } from "next/app";
 import React from "react";
+import { createGlobalStyle } from "styled-components";
 import Theme from "../components/Theme";
 import "../styles/globals.css";
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    overflow-x: hidden;
+  }
+`;
 
 function MyApp({ Component, pageProps }: AppProps) {
   React.useEffect(() => {
@@ -14,6 +21,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <Theme>
+      <GlobalStyle />
       <Component {...pageProps} />
     </Theme>
   );
