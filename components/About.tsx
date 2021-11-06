@@ -1,44 +1,27 @@
-import { motion, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { transparentize } from "polished";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React from "react";
 import { Box, Flex, Image } from "rebass/styled-components";
 import styled from "styled-components";
 import useBreakpoints from "../utils/useBreakpoint";
-import { CommonSectionContext } from "./CommonSection";
+import useParallaxAnimation from "../utils/useParallaxAnimation";
 import Typography from "./Typography";
 
-const TextCard = styled(Box)`
-  background-color: ${({ theme }) =>
-    transparentize(0.925, theme.colors.background.textContrast!)};
-  border-radius: 10px;
-
+const TextCardContainer = styled(motion.div)`
   @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 65%;
     max-width: 65%;
   } ;
 `;
 
-const TextCardContainer = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: auto;
-  left: 0;
+const TextCard = styled(Box)`
+  background-color: ${({ theme }) =>
+    transparentize(0.925, theme.colors.background.textContrast!)};
+  border-radius: 10px;
+  width: 100%;
 `;
 
 const ImageContainer = styled(Flex)`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: auto;
-
   @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
     width: 35%;
     max-width: 35%;
@@ -77,38 +60,9 @@ const ImageWrapper = styled(Box)`
 `;
 
 const About = () => {
-  const { currentWidth, currentHeight, isBelowBreakpoint } = useBreakpoints();
-  const [motionRange, setMotionRange] = useState({
-    textScroll: {
-      input: [0, 1],
-      output: [0, 0],
-    },
-    textCard: {
-      input: [0, 1],
-      output: [0, 0],
-    },
-    imageWrapper: {
-      input: [0, 0.5, 0.9, 1],
-      output: [0, 0, 0, 0],
-    },
-  });
-  const { progress } = useContext(CommonSectionContext);
-  const textCard = useRef<HTMLElement>(null);
-  const textScrollMotionValue = useTransform(
-    progress,
-    motionRange.textScroll.input,
-    motionRange.textScroll.output
-  );
-  const textCardMotionValue = useTransform(
-    progress,
-    motionRange.textCard.input,
-    motionRange.textCard.output
-  );
-  const imageWrapperMotionValue = useTransform(
-    progress,
-    motionRange.imageWrapper.input,
-    motionRange.imageWrapper.output
-  );
+  const { isBelowBreakpoint } = useBreakpoints();
+  const [cardOpacity, cardY, observeCard] = useParallaxAnimation();
+  const [imageOpacity, imageY, observeImage] = useParallaxAnimation();
 
   const content = {
     text: [
@@ -117,75 +71,35 @@ const About = () => {
     ],
   };
 
-  const calculateScrollDelta = useCallback(
-    (node: HTMLElement) => {
-      if (!node || !currentHeight) return;
-
-      const { scrollHeight, clientHeight } = node;
-      const { innerWidth } = window;
-      const isBelowMd = innerWidth < 768;
-      const delta = scrollHeight - clientHeight;
-      setMotionRange({
-        textScroll: {
-          input: isBelowMd ? [0, 1 / 3] : [0, 1],
-          output: [0, -delta],
-        },
-        textCard: {
-          input: isBelowMd ? [1 / 3, 2 / 3] : [0, 1],
-          output: innerWidth < 768 ? [0, -currentHeight] : [0, 0],
-        },
-        imageWrapper: {
-          input: isBelowMd ? [1 / 3, 2 / 3] : [0, 1],
-          output: isBelowMd ? [currentHeight, 0] : [0, 0],
-        },
-      });
-    },
-    [currentWidth, currentHeight]
-  );
-
-  useEffect(() => {
-    if (!textCard.current) return;
-
-    const observer = new ResizeObserver(() => {
-      calculateScrollDelta(textCard.current!);
-    });
-
-    observer.observe(textCard.current);
-
-    return () => observer.disconnect();
-  }, [currentWidth, currentHeight, isBelowBreakpoint?.md]);
-
   return (
-    <>
-      <TextCardContainer style={{ translateY: textCardMotionValue }}>
-        <TextCard
-          p={{ _: 4, md: 5 }}
-          maxHeight="100%"
-          overflow="hidden"
-          ref={textCard}
-        >
-          <motion.div style={{ translateY: textScrollMotionValue }}>
-            {content.text.map((paragraph, index) => (
-              <Typography
-                fontSize={{ _: 2, md: 3 }}
-                lineHeight={{ _: 2, md: 3 }}
-                m={{ _: 4, md: 4 }}
-                key={`about-paragraph-${index}`}
-              >
-                {paragraph}
-              </Typography>
-            ))}
-          </motion.div>
+    <Flex flexDirection={isBelowBreakpoint?.md ? "column" : "row"}>
+      <TextCardContainer
+        style={{
+          opacity: cardOpacity,
+          translateY: cardY,
+        }}
+      >
+        <TextCard p={{ _: 4, md: 5 }} ref={observeCard}>
+          {content.text.map((paragraph, index) => (
+            <Typography
+              fontSize={{ _: 2 }}
+              lineHeight={{ _: 2, md: 3 }}
+              m={{ _: 4, md: 4 }}
+              key={`about-paragraph-${index}`}
+            >
+              {paragraph}
+            </Typography>
+          ))}
         </TextCard>
       </TextCardContainer>
       <ImageContainer alignItems="center" justifyContent="center" p={{ _: 6 }}>
-        <motion.div style={{ translateY: imageWrapperMotionValue }}>
-          <ImageWrapper>
+        <motion.div style={{ opacity: imageOpacity, y: imageY }}>
+          <ImageWrapper my={{ _: 5 }} ref={observeImage}>
             <RoundedImage src="assets/potrait-placeholder.png" />
           </ImageWrapper>
         </motion.div>
       </ImageContainer>
-    </>
+    </Flex>
   );
 };
 

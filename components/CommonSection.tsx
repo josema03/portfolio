@@ -1,8 +1,8 @@
 import { motion, MotionValue } from "framer-motion";
 import React, { createContext, useContext } from "react";
 import { Box, Flex } from "rebass/styled-components";
-import styled from "styled-components";
 import { LayoutState } from "../pages";
+import usePositionObserver from "../utils/usePositionObserver";
 import Typography from "./Typography";
 
 interface CommonSectionContext {
@@ -20,17 +20,15 @@ interface CommonSectionProps {
   title: string;
 }
 
-const RelativeFlex = styled(Flex)`
-  position: relative;
-`;
-
 const CommonSection = ({
   index,
   title,
   children,
 }: React.PropsWithChildren<CommonSectionProps>) => {
-  const { contentTranslationX } = useContext(LayoutState);
   const componentId = title.toLowerCase().split(" ").join("-");
+  const { contentTranslationX } = useContext(LayoutState);
+  const [_componentVisibility, componentProgress, observeComponent] =
+    usePositionObserver();
 
   return (
     <>
@@ -47,16 +45,15 @@ const CommonSection = ({
             flexDirection="column"
             maxWidth={{ _: "425px", md: "1024px" }}
             width={{ _: "100vw", md: "75vw" }}
-            height="calc(100vh - 64px)"
-            maxHeight="calc(100vh - 64px)"
             mx="auto"
             p={{ _: 4, md: 5 }}
+            ref={observeComponent}
           >
             <Flex alignItems="center">
               <Typography
                 as="span"
                 fontColor="textAccent"
-                fontSize={{ _: 3, md: 3 }}
+                fontSize={{ _: 3, md: 4 }}
                 fontWeight={{ _: "600", md: "700" }}
               >
                 {index}.&nbsp;
@@ -64,7 +61,7 @@ const CommonSection = ({
               <Typography
                 as="h2"
                 fontColor="textPrimary"
-                fontSize={{ _: 3, md: 3 }}
+                fontSize={{ _: 3, md: 4 }}
                 fontWeight={{ _: "600", md: "700" }}
               >
                 {title}
@@ -79,15 +76,14 @@ const CommonSection = ({
                 />
               </Flex>
             </Flex>
-            <RelativeFlex
-              flex="1"
-              flexDirection="column"
-              maxHeight="100%"
-              overflow="visible"
-              py={{ _: 4 }}
+            <CommonSectionContext.Provider
+              value={{
+                progress: componentProgress,
+                parentId: componentId,
+              }}
             >
-              {children}
-            </RelativeFlex>
+              <Box py={{ _: 5 }}>{children}</Box>
+            </CommonSectionContext.Provider>
           </Flex>
         </Box>
       </motion.div>
